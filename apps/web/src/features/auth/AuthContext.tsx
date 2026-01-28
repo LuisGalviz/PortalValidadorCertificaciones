@@ -22,34 +22,44 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const init = async () => {
+    async function fetchUserFromApi() {
+      try {
+        const response = await api.get<{ success: boolean; data: AuthUser }>('/auth/me');
+        if (response.success) {
+          setUser(response.data);
+          return true;
+        }
+      } catch (apiError) {
+        console.error('Failed to fetch user info:', apiError);
+      }
+      return false;
+    }
+
+    function getUserFromToken() {
+      const tokenContent = keycloak.tokenParsed as {
+        email?: string;
+        name?: string;
+        preferred_username?: string;
+      };
+      if (tokenContent) {
+        setUser({
+          id: 0,
+          name: tokenContent.name || tokenContent.preferred_username || 'Usuario',
+          email: tokenContent.email || '',
+          permission: null,
+          oiaId: null,
+        });
+      }
+    }
+
+    async function init() {
       try {
         const authenticated = await initKeycloak();
 
         if (authenticated && getToken()) {
-          // Fetch user info from API
-          try {
-            const response = await api.get<{ success: boolean; data: AuthUser }>('/auth/me');
-            if (response.success) {
-              setUser(response.data);
-            }
-          } catch (apiError) {
-            console.error('Failed to fetch user info:', apiError);
-            // User is authenticated in Keycloak but not in backend, use token info
-            const tokenContent = keycloak.tokenParsed as {
-              email?: string;
-              name?: string;
-              preferred_username?: string;
-            };
-            if (tokenContent) {
-              setUser({
-                id: 0,
-                name: tokenContent.name || tokenContent.preferred_username || 'Usuario',
-                email: tokenContent.email || '',
-                permission: null,
-                oiaId: null,
-              });
-            }
+          const apiUserSet = await fetchUserFromApi();
+          if (!apiUserSet) {
+            getUserFromToken();
           }
         }
       } catch (error) {
@@ -57,11 +67,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } finally {
         setIsLoading(false);
       }
-    };
+    }
 
     init();
 
-    // Listen for token refresh events
     keycloak.onTokenExpired = () => {
       keycloak.updateToken(70).catch(() => {
         setUser(null);
