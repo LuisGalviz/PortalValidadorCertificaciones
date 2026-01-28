@@ -1,9 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
-import { FileText, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PendingReportsTable } from '@/components/tables/PendingReportsTable';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { api } from '@/lib/api';
 import type { ReportStats } from '@portal/shared';
+import { useQuery } from '@tanstack/react-query';
+import { AlertCircle, CheckCircle, FileText, XCircle } from 'lucide-react';
 
 interface DashboardStats {
   success: boolean;

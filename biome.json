@@ -38,14 +38,7 @@
     }
   },
   "files": {
-    "ignore": [
-      "node_modules",
-      "dist",
-      "build",
-      ".turbo",
-      "coverage",
-      "*.min.js"
-    ]
+    "ignore": ["node_modules", "dist", "build", ".turbo", "coverage", "*.min.js"]
   },
   "vcs": {
     "enabled": true,

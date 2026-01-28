@@ -1,5 +1,5 @@
-import type { InspectionResultValue, InspectionTypeValue } from '../enums/inspection.js';
 import type { OriginType } from '../enums/common.js';
+import type { InspectionResultValue, InspectionTypeValue } from '../enums/inspection.js';
 import type { StatusCodeType } from '../enums/status.js';
 
 export interface Report {

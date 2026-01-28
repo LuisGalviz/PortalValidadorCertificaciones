@@ -1,7 +1,7 @@
-import type { Request, Response, NextFunction } from 'express';
-import { logger } from '../config/logger.js';
-import { User, Permission, OiaUsers } from '../models/index.js';
 import { Profile } from '@portal/shared';
+import type { NextFunction, Request, Response } from 'express';
+import { logger } from '../config/logger.js';
+import { OiaUsers, Permission, User } from '../models/index.js';
 
 export interface AuthenticatedUser {
   id: number;
@@ -135,11 +135,7 @@ export const requireAdminOrStrategy = requireRoles([Profile.Admin, Profile.Strat
 export const requireAdminOrOia = requireRoles([Profile.Admin, Profile.Oia]);
 export const requireOia = requireRoles([Profile.Oia]);
 
-export function requireOiaOnly(
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-): void {
+export function requireOiaOnly(req: AuthenticatedRequest, res: Response, next: NextFunction): void {
   if (!req.user) {
     res.status(401).json({ success: false, error: 'Not authenticated' });
     return;

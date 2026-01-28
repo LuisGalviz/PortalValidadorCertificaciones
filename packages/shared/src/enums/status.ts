@@ -56,7 +56,8 @@ export const InspectorStatusCode = {
   Retired: Status.Retired,
 } as const;
 
-export type InspectorStatusCodeType = (typeof InspectorStatusCode)[keyof typeof InspectorStatusCode];
+export type InspectorStatusCodeType =
+  (typeof InspectorStatusCode)[keyof typeof InspectorStatusCode];
 
 export const StatusCodeReportsOia = {
   Pending: Status.Pending,

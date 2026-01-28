@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { app } from './app.js';
-import { config, logger, connectDatabase } from './config/index.js';
+import { config, connectDatabase, logger } from './config/index.js';
 
 async function main() {
   try {

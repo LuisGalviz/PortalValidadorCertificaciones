@@ -1,7 +1,7 @@
+import { OiaStatusCode, StatusRequestText } from '@portal/shared';
 import { Op } from 'sequelize';
-import { Oia, OiaUsers, User, Permission, Inspector } from '../models/index.js';
-import { StatusRequestText, OiaStatusCode } from '@portal/shared';
-import type { OiaFilterInput, CreateOiaInput, UpdateOiaInput } from '../validators/oia.js';
+import { Inspector, Oia, OiaUsers, Permission, User } from '../models/index.js';
+import type { CreateOiaInput, OiaFilterInput, UpdateOiaInput } from '../validators/oia.js';
 
 const getStatusName = (status: number): string => {
   switch (status) {

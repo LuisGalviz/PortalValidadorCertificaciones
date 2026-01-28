@@ -1,4 +1,4 @@
-import { InspectionTypeList, Causal } from '../models/index.js';
+import { Causal, InspectionTypeList } from '../models/index.js';
 
 export class CatalogService {
   async getInspectionTypes() {

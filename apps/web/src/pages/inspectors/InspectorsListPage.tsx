@@ -1,8 +1,6 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { InspectorsTable } from '@/components/tables/InspectorsTable';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -11,9 +9,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { InspectorsTable } from '@/components/tables/InspectorsTable';
 import { useAuth } from '@/features/auth';
-import { Profile, InspectorStatusCode } from '@portal/shared';
+import { InspectorStatusCode, Profile } from '@portal/shared';
+import { Plus } from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const statusOptions = [
   { value: 'all', label: 'Todos' },
@@ -29,8 +29,7 @@ export function InspectorsListPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  const canCreate =
-    user?.permission === Profile.Admin || user?.permission === Profile.Oia;
+  const canCreate = user?.permission === Profile.Admin || user?.permission === Profile.Oia;
 
   return (
     <div className="space-y-6">

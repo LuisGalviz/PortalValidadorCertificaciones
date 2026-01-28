@@ -1,7 +1,12 @@
 import type { Response } from 'express';
 import type { AuthenticatedRequest } from '../middleware/auth.js';
 import { oiaService } from '../services/OiaService.js';
-import { oiaFilterSchema, createOiaSchema, updateOiaSchema, idParamSchema } from '../validators/index.js';
+import {
+  createOiaSchema,
+  idParamSchema,
+  oiaFilterSchema,
+  updateOiaSchema,
+} from '../validators/index.js';
 
 export class OiaController {
   async findAll(req: AuthenticatedRequest, res: Response): Promise<void> {
@@ -52,7 +57,9 @@ export class OiaController {
       // Check if OIA with same identification exists
       const existing = await oiaService.findByIdentification(data.identification);
       if (existing) {
-        res.status(409).json({ success: false, error: 'OIA with this identification already exists' });
+        res
+          .status(409)
+          .json({ success: false, error: 'OIA with this identification already exists' });
         return;
       }
 

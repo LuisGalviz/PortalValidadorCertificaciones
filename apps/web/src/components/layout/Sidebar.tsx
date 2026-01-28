@@ -1,15 +1,8 @@
-import { Link, useLocation } from 'react-router-dom';
-import {
-  LayoutDashboard,
-  FileText,
-  Building2,
-  Users,
-  UserCheck,
-  Settings,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth';
+import { cn } from '@/lib/utils';
 import { Profile } from '@portal/shared';
+import { Building2, FileText, LayoutDashboard, Settings, UserCheck, Users } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },

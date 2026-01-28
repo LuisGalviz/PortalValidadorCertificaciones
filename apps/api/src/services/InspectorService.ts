@@ -1,9 +1,9 @@
+import { InspectorStatusCode, StatusRequestText } from '@portal/shared';
 import { Op } from 'sequelize';
 import { Inspector, Oia } from '../models/index.js';
-import { StatusRequestText, InspectorStatusCode } from '@portal/shared';
 import type {
-  InspectorFilterInput,
   CreateInspectorInput,
+  InspectorFilterInput,
   UpdateInspectorInput,
 } from '../validators/inspector.js';
 

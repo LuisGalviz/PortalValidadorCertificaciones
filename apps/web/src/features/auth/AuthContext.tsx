@@ -1,7 +1,7 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { keycloak, initKeycloak, login, logout as keycloakLogout, getToken } from '@/lib/keycloak';
 import { api } from '@/lib/api';
+import { getToken, initKeycloak, keycloak, logout as keycloakLogout, login } from '@/lib/keycloak';
 import type { AuthUser } from '@portal/shared';
+import { type ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -36,7 +36,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
           } catch (apiError) {
             console.error('Failed to fetch user info:', apiError);
             // User is authenticated in Keycloak but not in backend, use token info
-            const tokenContent = keycloak.tokenParsed as { email?: string; name?: string; preferred_username?: string };
+            const tokenContent = keycloak.tokenParsed as {
+              email?: string;
+              name?: string;
+              preferred_username?: string;
+            };
             if (tokenContent) {
               setUser({
                 id: 0,

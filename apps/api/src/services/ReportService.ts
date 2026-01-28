@@ -1,20 +1,24 @@
+import {
+  InspectionResultName,
+  InspectionTypeName,
+  ReportStatusText,
+  StatusCode,
+} from '@portal/shared';
 import { Op } from 'sequelize';
 import {
-  Report,
-  Oia,
-  Inspector,
-  ReportFile,
   Causal,
-  InspectionTypeList,
   ConstructionCompany,
+  InspectionTypeList,
+  Inspector,
+  Oia,
+  Report,
+  ReportFile,
 } from '../models/index.js';
-import {
-  StatusCode,
-  ReportStatusText,
-  InspectionTypeName,
-  InspectionResultName,
-} from '@portal/shared';
-import type { ReportFilterInput, CreateReportInput, ReviewReportInput } from '../validators/report.js';
+import type {
+  CreateReportInput,
+  ReportFilterInput,
+  ReviewReportInput,
+} from '../validators/report.js';
 
 export class ReportService {
   async findAll(filters: ReportFilterInput) {

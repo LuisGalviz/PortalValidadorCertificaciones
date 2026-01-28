@@ -1,8 +1,6 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ReportsTable } from '@/components/tables/ReportsTable';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -10,9 +8,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ReportsTable } from '@/components/tables/ReportsTable';
 import { useAuth } from '@/features/auth';
 import { Profile, StatusCode } from '@portal/shared';
+import { Plus } from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const statusOptions = [
   { value: 'all', label: 'Todos' },
@@ -26,8 +26,7 @@ export function ReportsListPage() {
   const { user } = useAuth();
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
-  const canCreateReport =
-    user?.permission === Profile.Admin || user?.permission === Profile.Oia;
+  const canCreateReport = user?.permission === Profile.Admin || user?.permission === Profile.Oia;
 
   const status = statusFilter === 'all' ? undefined : Number(statusFilter);
 

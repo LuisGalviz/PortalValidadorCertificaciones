@@ -1,13 +1,14 @@
+import { Profile } from '@portal/shared';
 import type { Response } from 'express';
+import { logger } from '../config/index.js';
 import type { AuthenticatedRequest } from '../middleware/auth.js';
 import { reportService } from '../services/ReportService.js';
 import {
-  reportFilterSchema,
   createReportSchema,
-  reviewReportSchema,
   idParamSchema,
+  reportFilterSchema,
+  reviewReportSchema,
 } from '../validators/index.js';
-import { Profile } from '@portal/shared';
 
 export class ReportController {
   async findAll(req: AuthenticatedRequest, res: Response): Promise<void> {

@@ -3,10 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Portal Validador de Certificaciones - React/Node.js/TypeScript",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "dev": "npm run dev --workspaces --if-present",
     "dev:web": "npm run dev -w apps/web",

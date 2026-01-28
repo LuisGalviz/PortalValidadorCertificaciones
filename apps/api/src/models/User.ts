@@ -14,7 +14,8 @@ interface UserAttributes {
   updatedAt?: Date;
 }
 
-interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
+interface UserCreationAttributes
+  extends Optional<UserAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
 
 export class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
   declare id: number;
@@ -76,5 +77,5 @@ User.init(
   }
 );
 
-import { Permission } from './Permission.js';
-import { OiaUsers } from './OiaUsers.js';
+import type { OiaUsers } from './OiaUsers.js';
+import type { Permission } from './Permission.js';

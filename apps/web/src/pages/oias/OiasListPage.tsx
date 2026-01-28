@@ -1,8 +1,6 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { OiasTable } from '@/components/tables/OiasTable';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -11,9 +9,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { OiasTable } from '@/components/tables/OiasTable';
 import { useAuth } from '@/features/auth';
-import { Profile, OiaStatusCode } from '@portal/shared';
+import { OiaStatusCode, Profile } from '@portal/shared';
+import { Plus } from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const statusOptions = [
   { value: 'all', label: 'Todos' },

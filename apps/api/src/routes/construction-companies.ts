@@ -4,9 +4,7 @@ import { ensureAuthenticated, requireAdmin } from '../middleware/auth.js';
 
 const router = Router();
 
-router.get('/', ensureAuthenticated, (req, res) =>
-  constructionCompanyController.findAll(req, res)
-);
+router.get('/', ensureAuthenticated, (req, res) => constructionCompanyController.findAll(req, res));
 router.get('/active', ensureAuthenticated, (req, res) =>
   constructionCompanyController.getActive(req, res)
 );

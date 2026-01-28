@@ -1,13 +1,13 @@
+import { Profile } from '@portal/shared';
 import type { Response } from 'express';
 import type { AuthenticatedRequest } from '../middleware/auth.js';
 import { reportService } from '../services/ReportService.js';
-import { Profile } from '@portal/shared';
 
 export class DashboardController {
   async getStats(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const oiaId =
-        req.user?.permission === Profile.Oia ? req.user.oiaId ?? undefined : undefined;
+        req.user?.permission === Profile.Oia ? (req.user.oiaId ?? undefined) : undefined;
 
       const stats = await reportService.getStats(oiaId);
 
@@ -24,7 +24,7 @@ export class DashboardController {
     try {
       const limit = Number(req.query.limit) || 10;
       const oiaId =
-        req.user?.permission === Profile.Oia ? req.user.oiaId ?? undefined : undefined;
+        req.user?.permission === Profile.Oia ? (req.user.oiaId ?? undefined) : undefined;
 
       const reports = await reportService.getPendingReports(limit, oiaId);
 

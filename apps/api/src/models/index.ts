@@ -1,15 +1,15 @@
-import { User } from './User.js';
-import { Permission } from './Permission.js';
+import { Causal } from './Causal.js';
+import { ConstructionCompany } from './ConstructionCompany.js';
+import { InspectionTypeList } from './InspectionTypeList.js';
+import { Inspector } from './Inspector.js';
+import { Jobs } from './Jobs.js';
 import { Oia } from './Oia.js';
 import { OiaUsers } from './OiaUsers.js';
-import { Inspector } from './Inspector.js';
+import { Order } from './Order.js';
+import { Permission } from './Permission.js';
 import { Report } from './Report.js';
 import { ReportFile } from './ReportFile.js';
-import { ConstructionCompany } from './ConstructionCompany.js';
-import { Order } from './Order.js';
-import { Jobs } from './Jobs.js';
-import { Causal } from './Causal.js';
-import { InspectionTypeList } from './InspectionTypeList.js';
+import { User } from './User.js';
 
 // User associations
 User.hasOne(Permission, { foreignKey: 'userId', as: 'permission' });

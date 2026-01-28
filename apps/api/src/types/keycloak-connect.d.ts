@@ -42,5 +42,5 @@ declare module 'keycloak-connect' {
   }
 
   export = Keycloak;
-  export { Grant, Token, GrantManager, KeycloakConfig, KeycloakOptions };
+  export type { Grant, Token, GrantManager, KeycloakConfig, KeycloakOptions };
 }

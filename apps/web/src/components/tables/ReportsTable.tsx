@@ -1,14 +1,14 @@
-import { useMemo, useRef, useCallback, useState } from 'react';
-import { AgGridReact } from 'ag-grid-react';
 import type { ColDef, GridReadyEvent, SortChangedEvent } from 'ag-grid-community';
+import { AgGridReact } from 'ag-grid-react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { api } from '@/lib/api';
-import { StatusCode, ReportStatusText } from '@portal/shared';
+import { ReportStatusText, StatusCode } from '@portal/shared';
+import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 
 interface ReportListItem {
   id: number;
@@ -174,7 +174,9 @@ export function ReportsTable({ oiaId, status }: ReportsTableProps) {
         <div className="text-sm text-muted-foreground">
           {data?.pagination && (
             <>
-              Mostrando {((page - 1) * pageSize) + 1} - {Math.min(page * pageSize, data.pagination.total)} de {data.pagination.total} registros
+              Mostrando {(page - 1) * pageSize + 1} -{' '}
+              {Math.min(page * pageSize, data.pagination.total)} de {data.pagination.total}{' '}
+              registros
             </>
           )}
         </div>

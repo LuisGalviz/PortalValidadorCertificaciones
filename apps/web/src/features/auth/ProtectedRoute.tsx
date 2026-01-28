@@ -1,6 +1,6 @@
+import type { ProfileType } from '@portal/shared';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
-import type { ProfileType } from '@portal/shared';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

@@ -7,12 +7,10 @@ export const ErrorTypes = {
   InvalidPermission: 'No tiene permiso para visualizar esta página',
   ErrorPermission: 'No tiene permiso para realizar esta acción',
   OIANotFound: 'No se encontró el OIA indicado',
-  ErrorOIA:
-    'OIA no se encuentra registrado en el portal validador o no tiene un estado válido.',
+  ErrorOIA: 'OIA no se encuentra registrado en el portal validador o no tiene un estado válido.',
   ReportCanNotValidate: 'Este reporte ya fue gestionado.',
   consecutiveInUse: 'Consecutivo se encuentra asociado a otro reporte.',
-  phoneIsAlreadyRegistered:
-    'El número de celular ingresado se encuentra asociado a otro usuario.',
+  phoneIsAlreadyRegistered: 'El número de celular ingresado se encuentra asociado a otro usuario.',
   companyIsAlreadyRegistered: 'La Firma instaladora ya se encuentra registrada en el portal.',
   S3UploadFailed: 'No se pudo subir el reporte a S3',
   InvalidPersonNumber: 'El número de identificación ingresado no es válido',
@@ -40,8 +38,7 @@ export const TypeNotify = {
   SuccessReport: 'Informe guardado exitosamente.',
   ErrorReport:
     'Estado de empresa inválido para el registro del informe, por favor intenta nuevamente',
-  Success:
-    'El registro fue exitoso, recibirá un correo indicandole el estado de la solicitud',
+  Success: 'El registro fue exitoso, recibirá un correo indicandole el estado de la solicitud',
   UpdateSuccess: 'La actualización de datos se realizó con éxito',
   Error: 'Hubo un error en el sistema, por favor intenta nuevamente',
   InvalidDataError:

@@ -1,7 +1,7 @@
-import { LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/features/auth';
 import { ProfileNames } from '@portal/shared';
+import { LogOut, User } from 'lucide-react';
 
 export function Header() {
   const { user, logout } = useAuth();
@@ -9,7 +9,9 @@ export function Header() {
   return (
     <header className="flex h-16 items-center justify-between border-b bg-white px-6">
       <div className="flex items-center">
-        <h2 className="text-lg font-semibold text-slate-900">Portal Validador de Certificaciones</h2>
+        <h2 className="text-lg font-semibold text-slate-900">
+          Portal Validador de Certificaciones
+        </h2>
       </div>
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2 text-sm text-slate-600">

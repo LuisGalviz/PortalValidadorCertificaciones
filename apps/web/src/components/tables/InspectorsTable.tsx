@@ -1,16 +1,16 @@
-import { useMemo, useRef, useCallback, useState } from 'react';
-import { AgGridReact } from 'ag-grid-react';
 import type { ColDef, GridReadyEvent, SortChangedEvent } from 'ag-grid-community';
+import { AgGridReact } from 'ag-grid-react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { Eye } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { api } from '@/lib/api';
 import { InspectorStatusCode, StatusRequestText } from '@portal/shared';
 import type { InspectorListItem, PaginatedResponse } from '@portal/shared';
+import { useQuery } from '@tanstack/react-query';
+import { Eye } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface InspectorsResponse {
   success: boolean;
@@ -165,7 +165,9 @@ export function InspectorsTable({ search, status, oiaId }: InspectorsTableProps)
         <div className="text-sm text-muted-foreground">
           {data?.pagination && (
             <>
-              Mostrando {((page - 1) * pageSize) + 1} - {Math.min(page * pageSize, data.pagination.total)} de {data.pagination.total} registros
+              Mostrando {(page - 1) * pageSize + 1} -{' '}
+              {Math.min(page * pageSize, data.pagination.total)} de {data.pagination.total}{' '}
+              registros
             </>
           )}
         </div>

@@ -1,14 +1,14 @@
-import { useMemo, useRef, useCallback } from 'react';
-import { AgGridReact } from 'ag-grid-react';
 import type { ColDef, GridReadyEvent } from 'ag-grid-community';
+import { AgGridReact } from 'ag-grid-react';
+import { useCallback, useMemo, useRef } from 'react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { Eye } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { api } from '@/lib/api';
+import { useQuery } from '@tanstack/react-query';
+import { Eye } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface PendingReport {
   id: number;
@@ -41,10 +41,26 @@ export function PendingReportsTable({ limit = 10 }: PendingReportsTableProps) {
   const columnDefs = useMemo<ColDef[]>(
     () => [
       { field: 'id', headerName: 'ID', width: 80 },
-      { field: 'orderExternal', headerName: 'Orden', width: 120, valueFormatter: (p) => p.value || '-' },
-      { field: 'address', headerName: 'Dirección', width: 200, flex: 1, valueFormatter: (p) => p.value || '-' },
+      {
+        field: 'orderExternal',
+        headerName: 'Orden',
+        width: 120,
+        valueFormatter: (p) => p.value || '-',
+      },
+      {
+        field: 'address',
+        headerName: 'Dirección',
+        width: 200,
+        flex: 1,
+        valueFormatter: (p) => p.value || '-',
+      },
       { field: 'oiaName', headerName: 'OIA', width: 150, valueFormatter: (p) => p.value || '-' },
-      { field: 'inspectorName', headerName: 'Inspector', width: 150, valueFormatter: (p) => p.value || '-' },
+      {
+        field: 'inspectorName',
+        headerName: 'Inspector',
+        width: 150,
+        valueFormatter: (p) => p.value || '-',
+      },
       {
         field: 'status',
         headerName: 'Estado',

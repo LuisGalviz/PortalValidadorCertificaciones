@@ -87,7 +87,9 @@ export class ConstructionCompanyController {
         data: companies,
       });
     } catch (error) {
-      res.status(500).json({ success: false, error: 'Error fetching active construction companies' });
+      res
+        .status(500)
+        .json({ success: false, error: 'Error fetching active construction companies' });
     }
   }
 }

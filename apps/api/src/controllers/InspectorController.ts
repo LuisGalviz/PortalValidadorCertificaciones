@@ -1,13 +1,13 @@
+import { Profile } from '@portal/shared';
 import type { Response } from 'express';
 import type { AuthenticatedRequest } from '../middleware/auth.js';
 import { inspectorService } from '../services/InspectorService.js';
 import {
-  inspectorFilterSchema,
   createInspectorSchema,
-  updateInspectorSchema,
   idParamSchema,
+  inspectorFilterSchema,
+  updateInspectorSchema,
 } from '../validators/index.js';
-import { Profile } from '@portal/shared';
 
 export class InspectorController {
   async findAll(req: AuthenticatedRequest, res: Response): Promise<void> {

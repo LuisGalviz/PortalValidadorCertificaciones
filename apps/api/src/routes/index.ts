@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import authRouter from './auth.js';
-import dashboardRouter from './dashboard.js';
-import reportsRouter from './reports.js';
-import oiasRouter from './oias.js';
-import inspectorsRouter from './inspectors.js';
-import constructionCompaniesRouter from './construction-companies.js';
 import catalogsRouter from './catalogs.js';
+import constructionCompaniesRouter from './construction-companies.js';
+import dashboardRouter from './dashboard.js';
+import inspectorsRouter from './inspectors.js';
+import oiasRouter from './oias.js';
+import reportsRouter from './reports.js';
 
 const router = Router();
 
