@@ -35,7 +35,7 @@ export async function connectDatabase(): Promise<void> {
     await sequelize.authenticate();
     logger.info('Database connection established successfully');
   } catch (error) {
-    logger.error('Unable to connect to the database:', error);
+    logger.error({ err: error }, 'Unable to connect to the database');
     throw error;
   }
 }
@@ -45,7 +45,7 @@ export async function disconnectDatabase(): Promise<void> {
     await sequelize.close();
     logger.info('Database connection closed');
   } catch (error) {
-    logger.error('Error closing database connection:', error);
+    logger.error({ err: error }, 'Error closing database connection');
     throw error;
   }
 }

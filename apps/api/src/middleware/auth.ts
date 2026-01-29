@@ -95,13 +95,13 @@ export async function ensureAuthenticated(
       id: user.id,
       name: user.name,
       email: user.email,
-      permission: user.permission?.permission || null,
+      permission: user.permission?.permission?.toString() || null,
       oiaId: (user as unknown as { oiaUser?: { oiaId: number } }).oiaUser?.oiaId || null,
     };
 
     next();
   } catch (error) {
-    logger.error('Authentication error:', error);
+    logger.error({ err: error }, 'Authentication error');
     res.status(500).json({ success: false, error: 'Authentication error' });
   }
 }

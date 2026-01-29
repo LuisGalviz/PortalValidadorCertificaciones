@@ -1,6 +1,5 @@
 import { Profile } from '@portal/shared';
 import type { Response } from 'express';
-import { logger } from '../config/index.js';
 import type { AuthenticatedRequest } from '../middleware/auth.js';
 import { reportService } from '../services/ReportService.js';
 import {

@@ -13,7 +13,7 @@ async function main() {
       logger.info(`Environment: ${config.nodeEnv}`);
     });
   } catch (error) {
-    logger.error('Failed to start server:', error);
+    logger.error({ err: error }, 'Failed to start server');
     process.exit(1);
   }
 }
