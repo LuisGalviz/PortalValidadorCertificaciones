@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useAuth } from '@/features/auth';
-import { Profile, StatusCode } from '@portal/shared';
+import { Permissions, StatusCode, hasPermission } from '@portal/shared';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -27,7 +27,7 @@ export function ReportsListPage() {
   const { user } = useAuth();
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
-  const canCreateReport = user?.permission === Profile.Admin || user?.permission === Profile.Oia;
+  const canCreateReport = hasPermission(user?.permission ?? null, Permissions.REPORTS_CREATE);
 
   const status = statusFilter === 'all' ? undefined : Number(statusFilter);
 

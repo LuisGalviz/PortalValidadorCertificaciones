@@ -1,13 +1,13 @@
-import type { ProfileType } from '@portal/shared';
+import { hasPermission } from '@portal/shared';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  allowedRoles?: ProfileType[];
+  requiredPermission?: string;
 }
 
-export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
+export function ProtectedRoute({ children, requiredPermission }: ProtectedRouteProps) {
   const { user, isLoading, isAuthenticated } = useAuth();
   const location = useLocation();
 
@@ -23,7 +23,7 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (allowedRoles && user?.permission && !allowedRoles.includes(user.permission)) {
+  if (requiredPermission && !hasPermission(user?.permission ?? null, requiredPermission)) {
     return <Navigate to="/dashboard" replace />;
   }
 

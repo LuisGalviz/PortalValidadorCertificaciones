@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/features/auth';
-import { Profile } from '@portal/shared';
+import { Permissions, hasPermission } from '@portal/shared';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -13,7 +13,7 @@ export function ConstructionCompaniesListPage() {
   const { user } = useAuth();
   const [search, setSearch] = useState('');
 
-  const canCreate = user?.permission === Profile.Admin;
+  const canCreate = hasPermission(user?.permission ?? null, Permissions.COMPANIES_CREATE);
 
   return (
     <PageContainer className="space-y-4 lg:space-y-6 xl:space-y-8 min-w-0">

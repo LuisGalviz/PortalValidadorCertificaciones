@@ -1,9 +1,26 @@
 import type { Response } from 'express';
 import type { AuthenticatedRequest } from '../middleware/auth.js';
+import { TypeOrganism } from '../models/index.js';
 import { catalogService } from '../services/CatalogService.js';
 import { checkListService } from '../services/CheckListService.js';
 
 export class CatalogController {
+  async getTypeOrganisms(_req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      const types = await TypeOrganism.findAll({
+        where: { active: true },
+        order: [['name', 'ASC']],
+      });
+
+      res.json({
+        success: true,
+        data: types,
+      });
+    } catch (error) {
+      res.status(500).json({ success: false, error: 'Error fetching organism types' });
+    }
+  }
+
   async getInspectionTypes(_req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const types = await catalogService.getInspectionTypes();

@@ -25,11 +25,12 @@ async function fetchApi<T>(endpoint: string, options: FetchOptions = {}): Promis
   }
 
   const token = getToken();
+  const isFormData = fetchOptions.body instanceof FormData;
 
   const response = await fetch(url, {
     ...fetchOptions,
     headers: {
-      'Content-Type': 'application/json',
+      ...(!isFormData && { 'Content-Type': 'application/json' }),
       ...(token && { Authorization: `Bearer ${token}` }),
       ...fetchOptions.headers,
     },
@@ -47,16 +48,18 @@ export const api = {
   get: <T>(endpoint: string, params?: Record<string, string | number | undefined>) =>
     fetchApi<T>(endpoint, { method: 'GET', params }),
 
-  post: <T>(endpoint: string, data?: unknown) =>
+  post: <T>(endpoint: string, data?: unknown, options: FetchOptions = {}) =>
     fetchApi<T>(endpoint, {
+      ...options,
       method: 'POST',
-      body: data ? JSON.stringify(data) : undefined,
+      body: data instanceof FormData ? data : data ? JSON.stringify(data) : undefined,
     }),
 
-  put: <T>(endpoint: string, data?: unknown) =>
+  put: <T>(endpoint: string, data?: unknown, options: FetchOptions = {}) =>
     fetchApi<T>(endpoint, {
+      ...options,
       method: 'PUT',
-      body: data ? JSON.stringify(data) : undefined,
+      body: data instanceof FormData ? data : data ? JSON.stringify(data) : undefined,
     }),
 
   delete: <T>(endpoint: string) => fetchApi<T>(endpoint, { method: 'DELETE' }),

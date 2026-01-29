@@ -1,8 +1,9 @@
 import { useAuth } from '@/features/auth';
 import { useSidebar } from '@/hooks';
 import { cn } from '@/lib/utils';
-import { Profile } from '@portal/shared';
+import { Permissions, hasPermission } from '@portal/shared';
 import {
+  Briefcase,
   Building2,
   ChevronLeft,
   ChevronRight,
@@ -17,15 +18,26 @@ import {
 import { Link, useLocation } from 'react-router-dom';
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Reportes', href: '/reports', icon: FileText },
-  { name: 'OIAs', href: '/oias', icon: Building2, roles: [Profile.Admin, Profile.Strategy] },
-  { name: 'Inspectores', href: '/inspectors', icon: UserCheck },
+  {
+    name: 'Dashboard',
+    href: '/dashboard',
+    icon: LayoutDashboard,
+    permission: Permissions.DASHBOARD_READ,
+  },
+  { name: 'Reportes', href: '/reports', icon: FileText, permission: Permissions.REPORTS_READ },
+  { name: 'Mi Empresa', href: '/my-oia', icon: Briefcase, permission: Permissions.OIAS_READ_OWN },
+  { name: 'OIAs', href: '/oias', icon: Building2, permission: Permissions.OIAS_READ },
+  {
+    name: 'Inspectores',
+    href: '/inspectors',
+    icon: UserCheck,
+    permission: Permissions.INSPECTORS_READ,
+  },
   {
     name: 'Firmas Instaladoras',
     href: '/construction-companies',
     icon: Users,
-    roles: [Profile.Admin, Profile.Strategy],
+    permission: Permissions.COMPANIES_READ,
   },
 ];
 
@@ -36,9 +48,7 @@ export function Sidebar() {
   const isCollapsed = state === 'collapsed';
 
   const filteredNavigation = navigation.filter((item) => {
-    if (!item.roles) return true;
-    if (user?.permission === Profile.Admin) return true;
-    return user?.permission ? item.roles.some((role) => role === user.permission) : false;
+    return hasPermission(user?.permission ?? null, item.permission);
   });
 
   return (

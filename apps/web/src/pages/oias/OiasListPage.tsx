@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useAuth } from '@/features/auth';
-import { OiaStatusCode, Profile } from '@portal/shared';
+import { OiaStatusCode, Permissions, hasPermission } from '@portal/shared';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -30,7 +30,7 @@ export function OiasListPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  const canCreate = user?.permission === Profile.Admin;
+  const canCreate = hasPermission(user?.permission ?? null, Permissions.OIAS_CREATE);
 
   return (
     <PageContainer className="space-y-4 lg:space-y-6 xl:space-y-8 min-w-0">

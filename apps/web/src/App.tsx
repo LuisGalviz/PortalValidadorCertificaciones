@@ -26,6 +26,7 @@ function App() {
           richColors
           closeButton
           duration={5000}
+          offset="80px"
           toastOptions={{
             style: {
               fontSize: '14px',

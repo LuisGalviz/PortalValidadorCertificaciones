@@ -6,12 +6,14 @@ import { InspectionTypeList } from './InspectionTypeList.js';
 import { Inspector } from './Inspector.js';
 import { Jobs } from './Jobs.js';
 import { Oia } from './Oia.js';
+import { OiaFile } from './OiaFile.js';
 import { OiaUsers } from './OiaUsers.js';
 import { Order } from './Order.js';
 import { Permission } from './Permission.js';
 import { Report } from './Report.js';
 import { ReportCheck } from './ReportCheck.js';
 import { ReportFile } from './ReportFile.js';
+import { TypeOrganism } from './TypeOrganism.js';
 import { User } from './User.js';
 
 // User associations
@@ -25,8 +27,14 @@ OiaUsers.belongsTo(User, { foreignKey: 'userId' });
 Oia.hasMany(OiaUsers, { foreignKey: 'oiaId', as: 'oiaUsers' });
 OiaUsers.belongsTo(Oia, { foreignKey: 'oiaId' });
 
+Oia.belongsTo(TypeOrganism, { foreignKey: 'typeOrganismId', as: 'typeOrganism' });
+TypeOrganism.hasMany(Oia, { foreignKey: 'typeOrganismId' });
+
 Oia.hasMany(Inspector, { foreignKey: 'oiaId', as: 'inspectors' });
 Inspector.belongsTo(Oia, { foreignKey: 'oiaId', as: 'oia' });
+
+Oia.hasMany(OiaFile, { foreignKey: 'oiaId', as: 'files' });
+OiaFile.belongsTo(Oia, { foreignKey: 'oiaId', as: 'oia' });
 
 Oia.hasMany(Report, { foreignKey: 'oiaId', as: 'reports' });
 Report.belongsTo(Oia, { foreignKey: 'oiaId', as: 'oia' });
@@ -69,6 +77,7 @@ export {
   User,
   Permission,
   Oia,
+  OiaFile,
   OiaUsers,
   Inspector,
   Report,
@@ -81,6 +90,7 @@ export {
   InspectionTypeList,
   CheckList,
   InspectionTypeCheckList,
+  TypeOrganism,
 };
 
 export { sequelize } from '../config/database.js';

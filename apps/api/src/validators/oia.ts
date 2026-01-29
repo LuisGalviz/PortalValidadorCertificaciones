@@ -30,6 +30,27 @@ export const updateOiaSchema = createOiaSchema.partial().extend({
   active: z.boolean().optional(),
 });
 
+export const updateOwnOiaSchema = z.object({
+  // OIA data
+  name: z.string().min(1).optional(),
+  codeAcred: z.string().min(1).optional(),
+  effectiveDate: z.string().or(z.date()).optional(),
+  cedRepLegal: z.coerce.number().int().optional(),
+  nameRepLegal: z.string().optional(),
+  addressRepLegal: z.string().optional(),
+  typeOrganismId: z.coerce.number().int().optional(),
+  addressOrganism: z.string().optional(),
+  // Contact data (OIA)
+  nameContact: z.string().optional(),
+  phoneContact: z.coerce.number().int().optional(),
+  phoneContactAlternative: z.coerce.number().int().optional(),
+  // Notification user data
+  userName: z.string().min(1),
+  userPhone: z.coerce.number().int(),
+  userEmail: z.string().email(),
+});
+
 export type OiaFilterInput = z.infer<typeof oiaFilterSchema>;
 export type CreateOiaInput = z.infer<typeof createOiaSchema>;
 export type UpdateOiaInput = z.infer<typeof updateOiaSchema>;
+export type UpdateOwnOiaInput = z.infer<typeof updateOwnOiaSchema>;

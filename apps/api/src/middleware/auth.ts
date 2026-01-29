@@ -1,7 +1,7 @@
-import { Profile } from '@portal/shared';
+import { Permissions, hasPermission } from '@portal/shared';
 import type { NextFunction, Request, Response } from 'express';
 import { logger } from '../config/logger.js';
-import { OiaUsers, Permission, User } from '../models/index.js';
+import { OiaUsers, Permission as PermissionModel, User } from '../models/index.js';
 
 export interface AuthenticatedUser {
   id: number;
@@ -55,13 +55,11 @@ export async function ensureAuthenticated(
       return;
     }
 
-    // Check if token is expired
     if (payload.exp && payload.exp * 1000 < Date.now()) {
       res.status(401).json({ success: false, error: 'Token expired' });
       return;
     }
 
-    // Get user email from token
     const email = payload.email || payload.preferred_username;
 
     if (!email) {
@@ -69,17 +67,15 @@ export async function ensureAuthenticated(
       return;
     }
 
-    // Find user in database
     const user = await User.findOne({
       where: { authEmail: email },
       include: [
-        { model: Permission, as: 'permission' },
+        { model: PermissionModel, as: 'permission' },
         { model: OiaUsers, as: 'oiaUser' },
       ],
     });
 
     if (!user) {
-      // User exists in Keycloak but not in DB - return basic info from token
       req.user = {
         id: 0,
         name: payload.name || email,
@@ -106,22 +102,16 @@ export async function ensureAuthenticated(
   }
 }
 
-export function requireRoles(allowedRoles: string[]) {
+export function requirePermission(requiredPermission: string) {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     if (!req.user) {
       res.status(401).json({ success: false, error: 'Not authenticated' });
       return;
     }
 
-    const userPermission = req.user.permission;
+    const userRole = req.user.permission;
 
-    // Admin has access to everything
-    if (userPermission === Profile.Admin) {
-      next();
-      return;
-    }
-
-    if (!userPermission || !allowedRoles.includes(userPermission)) {
+    if (!hasPermission(userRole, requiredPermission)) {
       res.status(403).json({ success: false, error: 'Insufficient permissions' });
       return;
     }
@@ -130,21 +120,21 @@ export function requireRoles(allowedRoles: string[]) {
   };
 }
 
-export const requireAdmin = requireRoles([Profile.Admin]);
-export const requireAdminOrStrategy = requireRoles([Profile.Admin, Profile.Strategy]);
-export const requireAdminOrOia = requireRoles([Profile.Admin, Profile.Oia]);
-export const requireOia = requireRoles([Profile.Oia]);
+export const canReadReports = requirePermission(Permissions.REPORTS_READ);
+export const canCreateReports = requirePermission(Permissions.REPORTS_CREATE);
+export const canReviewReports = requirePermission(Permissions.REPORTS_REVIEW);
 
-export function requireOiaOnly(req: AuthenticatedRequest, res: Response, next: NextFunction): void {
-  if (!req.user) {
-    res.status(401).json({ success: false, error: 'Not authenticated' });
-    return;
-  }
+export const canReadOias = requirePermission(Permissions.OIAS_READ);
+export const canReadOwnOia = requirePermission(Permissions.OIAS_READ_OWN);
+export const canCreateOias = requirePermission(Permissions.OIAS_CREATE);
+export const canUpdateOias = requirePermission(Permissions.OIAS_UPDATE);
+export const canUpdateOwnOia = requirePermission(Permissions.OIAS_UPDATE_OWN);
 
-  if (req.user.permission !== Profile.Oia) {
-    res.status(403).json({ success: false, error: 'OIA access only' });
-    return;
-  }
+export const canReadInspectors = requirePermission(Permissions.INSPECTORS_READ);
+export const canCreateInspectors = requirePermission(Permissions.INSPECTORS_CREATE);
+export const canUpdateInspectors = requirePermission(Permissions.INSPECTORS_UPDATE);
 
-  next();
-}
+export const canReadCompanies = requirePermission(Permissions.COMPANIES_READ);
+export const canCreateCompanies = requirePermission(Permissions.COMPANIES_CREATE);
+
+export const canReadDashboard = requirePermission(Permissions.DASHBOARD_READ);
