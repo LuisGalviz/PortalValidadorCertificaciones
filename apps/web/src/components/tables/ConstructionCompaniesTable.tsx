@@ -98,7 +98,7 @@ export function ConstructionCompaniesTable({ search }: ConstructionCompaniesTabl
 
   return (
     <div className="space-y-4">
-      <div className="ag-theme-alpine h-[500px] w-full">
+      <div className="ag-theme-alpine h-[500px] lg:h-[550px] xl:h-[600px] 2xl:h-[700px] w-full">
         <AgGridReact
           ref={gridRef}
           rowData={data?.data || []}
@@ -114,7 +114,7 @@ export function ConstructionCompaniesTable({ search }: ConstructionCompaniesTabl
 
       {/* Custom Pagination */}
       <div className="flex items-center justify-between px-2">
-        <div className="text-sm text-muted-foreground">
+        <div className="text-sm xl:text-base text-muted-foreground">
           {data?.pagination && (
             <>
               Mostrando {(page - 1) * pageSize + 1} -{' '}
@@ -123,16 +123,17 @@ export function ConstructionCompaniesTable({ search }: ConstructionCompaniesTabl
             </>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 xl:gap-3">
           <Button
             variant="outline"
             size="sm"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1 || isLoading}
+            className="xl:h-9 xl:px-4"
           >
             Anterior
           </Button>
-          <span className="text-sm">
+          <span className="text-sm xl:text-base">
             Página {page} de {totalPages}
           </span>
           <Button
@@ -140,6 +141,7 @@ export function ConstructionCompaniesTable({ search }: ConstructionCompaniesTabl
             size="sm"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages || isLoading}
+            className="xl:h-9 xl:px-4"
           >
             Siguiente
           </Button>

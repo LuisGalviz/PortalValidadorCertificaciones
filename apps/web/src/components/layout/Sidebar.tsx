@@ -28,11 +28,11 @@ export function Sidebar() {
   });
 
   return (
-    <div className="flex h-full w-64 flex-col bg-slate-900">
-      <div className="flex h-16 items-center px-4">
-        <h1 className="text-xl font-bold text-white">Portal Validador</h1>
+    <div className="flex h-full w-60 xl:w-64 2xl:w-72 flex-col bg-slate-900">
+      <div className="flex h-16 xl:h-18 2xl:h-20 items-center px-4 xl:px-5 2xl:px-6">
+        <h1 className="text-lg xl:text-xl 2xl:text-2xl font-bold text-white">Portal Validador</h1>
       </div>
-      <nav className="flex-1 space-y-1 px-2 py-4">
+      <nav className="flex-1 space-y-1 px-2 xl:px-3 2xl:px-4 py-4">
         {filteredNavigation.map((item) => {
           const isActive = location.pathname.startsWith(item.href);
           return (
@@ -40,7 +40,7 @@ export function Sidebar() {
               key={item.name}
               to={item.href}
               className={cn(
-                'group flex items-center rounded-md px-2 py-2 text-sm font-medium',
+                'group flex items-center rounded-md px-2 xl:px-3 py-2 xl:py-2.5 2xl:py-3 text-sm xl:text-base font-medium',
                 isActive
                   ? 'bg-slate-800 text-white'
                   : 'text-slate-300 hover:bg-slate-700 hover:text-white'
@@ -48,7 +48,7 @@ export function Sidebar() {
             >
               <item.icon
                 className={cn(
-                  'mr-3 h-5 w-5 flex-shrink-0',
+                  'mr-3 h-5 w-5 xl:h-5 xl:w-5 2xl:h-6 2xl:w-6 flex-shrink-0',
                   isActive ? 'text-white' : 'text-slate-400 group-hover:text-white'
                 )}
               />
@@ -57,12 +57,12 @@ export function Sidebar() {
           );
         })}
       </nav>
-      <div className="border-t border-slate-700 p-4">
+      <div className="border-t border-slate-700 p-4 xl:p-5">
         <Link
           to="/settings"
-          className="group flex items-center rounded-md px-2 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-white"
+          className="group flex items-center rounded-md px-2 xl:px-3 py-2 xl:py-2.5 2xl:py-3 text-sm xl:text-base font-medium text-slate-300 hover:bg-slate-700 hover:text-white"
         >
-          <Settings className="mr-3 h-5 w-5 text-slate-400 group-hover:text-white" />
+          <Settings className="mr-3 h-5 w-5 xl:h-5 xl:w-5 2xl:h-6 2xl:w-6 text-slate-400 group-hover:text-white" />
           Configuración
         </Link>
       </div>

@@ -55,10 +55,18 @@ export interface ReportFile {
 export interface ReportCheck {
   id: number;
   reportId: number;
-  checkListId: number;
-  value?: boolean | null;
+  checkId: number;
+  review?: boolean | null;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface CheckListItem {
+  id: number;
+  description: string;
+  order: number;
+  count: number;
+  review?: boolean | null;
 }
 
 export interface CreateReportInput {
@@ -87,6 +95,7 @@ export interface ReviewReportInput {
   status: StatusCodeType;
   comment?: string;
   causalId?: number;
+  checks?: Array<{ checkId: number; review: boolean }>;
 }
 
 export interface ReportListItem {
@@ -117,6 +126,7 @@ export interface ReportDetail extends Report {
   constructionCompanyName?: string;
   files?: ReportFile[];
   checks?: ReportCheck[];
+  checkList?: CheckListItem[] | null;
 }
 
 export interface ReportStats {

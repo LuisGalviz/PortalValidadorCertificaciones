@@ -1,5 +1,7 @@
 import { Causal } from './Causal.js';
+import { CheckList } from './CheckList.js';
 import { ConstructionCompany } from './ConstructionCompany.js';
+import { InspectionTypeCheckList } from './InspectionTypeCheckList.js';
 import { InspectionTypeList } from './InspectionTypeList.js';
 import { Inspector } from './Inspector.js';
 import { Jobs } from './Jobs.js';
@@ -8,6 +10,7 @@ import { OiaUsers } from './OiaUsers.js';
 import { Order } from './Order.js';
 import { Permission } from './Permission.js';
 import { Report } from './Report.js';
+import { ReportCheck } from './ReportCheck.js';
 import { ReportFile } from './ReportFile.js';
 import { User } from './User.js';
 
@@ -51,6 +54,17 @@ ConstructionCompany.hasMany(Report, { foreignKey: 'constructionCompanyId' });
 Report.belongsTo(Order, { foreignKey: 'orderId', as: 'order' });
 Order.hasMany(Report, { foreignKey: 'orderId' });
 
+// ReportCheck associations
+Report.hasMany(ReportCheck, { foreignKey: 'reportId', as: 'checks' });
+ReportCheck.belongsTo(Report, { foreignKey: 'reportId' });
+
+ReportCheck.belongsTo(CheckList, { foreignKey: 'checkId', as: 'checkItem' });
+CheckList.hasMany(ReportCheck, { foreignKey: 'checkId' });
+
+// CheckList associations
+CheckList.hasMany(InspectionTypeCheckList, { foreignKey: 'checklistId', as: 'inspectionTypes' });
+InspectionTypeCheckList.belongsTo(CheckList, { foreignKey: 'checklistId', as: 'checkItem' });
+
 export {
   User,
   Permission,
@@ -59,11 +73,14 @@ export {
   Inspector,
   Report,
   ReportFile,
+  ReportCheck,
   ConstructionCompany,
   Order,
   Jobs,
   Causal,
   InspectionTypeList,
+  CheckList,
+  InspectionTypeCheckList,
 };
 
 export { sequelize } from '../config/database.js';

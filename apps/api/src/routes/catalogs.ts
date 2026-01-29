@@ -8,5 +8,8 @@ router.get('/inspection-types', ensureAuthenticated, (req, res) =>
   catalogController.getInspectionTypes(req, res)
 );
 router.get('/causals', ensureAuthenticated, (req, res) => catalogController.getCausals(req, res));
+router.get('/checklist/:inspectionType', ensureAuthenticated, (req, res) =>
+  catalogController.getCheckList(req, res)
+);
 
 export default router;

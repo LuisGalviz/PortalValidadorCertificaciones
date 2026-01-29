@@ -7,24 +7,24 @@ export function Header() {
   const { user, logout } = useAuth();
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-white px-6">
+    <header className="flex h-14 xl:h-16 2xl:h-18 items-center justify-between border-b bg-white px-4 lg:px-6 xl:px-8 2xl:px-10">
       <div className="flex items-center">
-        <h2 className="text-lg font-semibold text-slate-900">
+        <h2 className="text-base lg:text-lg xl:text-xl font-semibold text-slate-900">
           Portal Validador de Certificaciones
         </h2>
       </div>
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2 text-sm text-slate-600">
-          <User className="h-4 w-4" />
+      <div className="flex items-center gap-3 xl:gap-4 2xl:gap-6">
+        <div className="flex items-center gap-2 xl:gap-3 text-sm xl:text-base text-slate-600">
+          <User className="h-4 w-4 xl:h-5 xl:w-5" />
           <span>{user?.name}</span>
           {user?.permission && (
-            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs">
+            <span className="rounded-full bg-slate-100 px-2 xl:px-3 py-0.5 xl:py-1 text-xs xl:text-sm">
               {ProfileNames[user.permission] || user.permission}
             </span>
           )}
         </div>
         <Button variant="ghost" size="sm" onClick={logout}>
-          <LogOut className="h-4 w-4 mr-2" />
+          <LogOut className="h-4 w-4 xl:h-5 xl:w-5 mr-2" />
           Salir
         </Button>
       </div>

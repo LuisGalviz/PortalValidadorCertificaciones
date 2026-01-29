@@ -20,6 +20,7 @@ import type {
   ReportFilterInput,
   ReviewReportInput,
 } from '../validators/report.js';
+import { checkListService } from './CheckListService.js';
 
 export class ReportService {
   async findAll(filters: ReportFilterInput) {
@@ -112,6 +113,18 @@ export class ReportService {
       return null;
     }
 
+    const reportData = report as unknown as {
+      oia?: { name: string };
+      inspector?: { name: string };
+      causal?: { description: string };
+      constructionCompany?: { name: string };
+    };
+
+    let checkList = null;
+    if (report.inspectionType) {
+      checkList = await checkListService.getCheckListWithReviews(report.inspectionType, id);
+    }
+
     return {
       ...report.toJSON(),
       statusName: ReportStatusText[report.status] || 'Desconocido',
@@ -121,8 +134,11 @@ export class ReportService {
       inspectionResultName: report.inspectionResult
         ? InspectionResultName[report.inspectionResult]
         : undefined,
-      oiaName: (report as unknown as { oia?: { name: string } }).oia?.name,
-      inspectorName: (report as unknown as { inspector?: { name: string } }).inspector?.name,
+      oiaName: reportData.oia?.name,
+      inspectorName: reportData.inspector?.name,
+      causalName: reportData.causal?.description,
+      constructionCompanyName: reportData.constructionCompany?.name,
+      checkList,
     };
   }
 
@@ -150,6 +166,10 @@ export class ReportService {
       userId,
       reviewDate: new Date(),
     });
+
+    if (data.checks && data.checks.length > 0) {
+      await checkListService.saveCheckList(id, data.checks);
+    }
 
     return report;
   }

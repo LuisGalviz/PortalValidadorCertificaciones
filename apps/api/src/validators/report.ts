@@ -37,6 +37,14 @@ export const reviewReportSchema = z.object({
   status: z.number().int(),
   comment: z.string().optional(),
   causalId: z.number().int().optional(),
+  checks: z
+    .array(
+      z.object({
+        checkId: z.number().int(),
+        review: z.boolean(),
+      })
+    )
+    .optional(),
 });
 
 export type ReportFilterInput = z.infer<typeof reportFilterSchema>;

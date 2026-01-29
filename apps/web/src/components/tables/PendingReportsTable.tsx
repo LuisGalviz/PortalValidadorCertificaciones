@@ -130,7 +130,7 @@ export function PendingReportsTable({ limit = 10 }: PendingReportsTableProps) {
   );
 
   return (
-    <div className="ag-theme-alpine h-[400px] w-full">
+    <div className="ag-theme-alpine h-[350px] lg:h-[400px] xl:h-[450px] 2xl:h-[500px] w-full">
       <AgGridReact
         ref={gridRef}
         rowData={data?.data || []}
