@@ -214,7 +214,7 @@ export function ReportDetailPage() {
                   <li key={file.id} className="flex items-center gap-2">
                     <FileText className="h-4 w-4 text-slate-400" />
                     <a
-                      href={file.path}
+                      href={file.path ?? '#'}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-primary hover:underline"

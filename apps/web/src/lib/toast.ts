@@ -76,7 +76,7 @@ export function showConfirm(
     },
     cancel: {
       label: options.cancelText || 'Cancelar',
-      onClick: options.onCancel,
+      onClick: options.onCancel || (() => {}),
     },
   });
 }

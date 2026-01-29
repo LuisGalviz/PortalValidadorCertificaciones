@@ -1,5 +1,5 @@
 import { dismissLoading, showError, showLoading } from '@/lib/toast';
-import { type UseMutationOptions, useMutation } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 
 interface NotifiedMutationOptions<TData, TVariables> {
   mutationFn: (variables: TVariables) => Promise<TData>;

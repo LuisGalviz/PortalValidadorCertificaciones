@@ -46,11 +46,10 @@ export interface Report {
 export interface ReportFile {
   id: number;
   reportId: number;
-  fileType: string;
-  fileName: string;
-  fileUrl: string;
-  createdAt: Date;
-  updatedAt: Date;
+  name: string;
+  type?: string | null;
+  path?: string | null;
+  fileTypeCode?: string | null;
 }
 
 export interface ReportCheck {
