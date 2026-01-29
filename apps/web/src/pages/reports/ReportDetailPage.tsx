@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { api } from '@/lib/api';
+import { dismissLoading, showError, showLoading, showSuccess } from '@/lib/toast';
 import { ReportStatusText, StatusCode } from '@portal/shared';
 import type { ReportDetail } from '@portal/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -27,9 +28,23 @@ export function ReportDetailPage() {
   const reviewMutation = useMutation({
     mutationFn: (reviewData: { status: number; comment?: string }) =>
       api.post(`/reports/${id}/review`, reviewData),
-    onSuccess: () => {
+    onMutate: () => {
+      return showLoading('Procesando revisión...');
+    },
+    onSuccess: (_data, variables, toastId) => {
+      dismissLoading(toastId as string | number);
+      const isApproved = variables.status === StatusCode.Approved;
+      showSuccess(
+        isApproved ? 'Reporte aprobado' : 'Reporte rechazado',
+        `El reporte #${id} ha sido ${isApproved ? 'aprobado' : 'rechazado'} correctamente`
+      );
       queryClient.invalidateQueries({ queryKey: ['report', id] });
       queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-reports'] });
+    },
+    onError: (error: Error, _variables, toastId) => {
+      dismissLoading(toastId as string | number);
+      showError('Error al procesar la revisión', error.message);
     },
   });
 
@@ -199,12 +214,12 @@ export function ReportDetailPage() {
                   <li key={file.id} className="flex items-center gap-2">
                     <FileText className="h-4 w-4 text-slate-400" />
                     <a
-                      href={file.fileUrl}
+                      href={file.path}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-primary hover:underline"
                     >
-                      {file.fileName}
+                      {file.name}
                     </a>
                   </li>
                 ))}

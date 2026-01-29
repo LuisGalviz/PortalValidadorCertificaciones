@@ -2,6 +2,7 @@ import { AuthProvider } from '@/features/auth';
 import { router } from '@/routes';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from 'react-router-dom';
+import { Toaster } from 'sonner';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,6 +18,17 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <RouterProvider router={router} />
+        <Toaster
+          position="top-right"
+          richColors
+          closeButton
+          duration={5000}
+          toastOptions={{
+            style: {
+              fontSize: '14px',
+            },
+          }}
+        />
       </AuthProvider>
     </QueryClientProvider>
   );
