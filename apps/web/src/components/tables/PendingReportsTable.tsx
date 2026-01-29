@@ -1,22 +1,21 @@
-import type { ColDef, GridReadyEvent } from 'ag-grid-community';
+import type { ColDef, ValueFormatterParams } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
-import { useCallback, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { api } from '@/lib/api';
 import { useQuery } from '@tanstack/react-query';
-import { Eye } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface PendingReport {
   id: number;
+  orderId?: number;
   orderExternal?: string;
-  address?: string;
-  inspectionDate?: string;
+  subscriptionId?: number;
+  inspectionType?: string;
   oiaName?: string;
-  inspectorName?: string;
   createdAt: string;
 }
 
@@ -27,6 +26,15 @@ interface PendingReportsResponse {
 
 interface PendingReportsTableProps {
   limit?: number;
+}
+
+function formatDate(value: string | null | undefined): string {
+  if (!value) return '';
+  const date = new Date(value);
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
 }
 
 export function PendingReportsTable({ limit = 10 }: PendingReportsTableProps) {
@@ -40,44 +48,72 @@ export function PendingReportsTable({ limit = 10 }: PendingReportsTableProps) {
 
   const columnDefs = useMemo<ColDef[]>(
     () => [
-      { field: 'id', headerName: 'ID', width: 80 },
+      {
+        headerName: '#',
+        width: 60,
+        valueGetter: (params) => (params.node?.rowIndex ?? 0) + 1,
+        cellClass: 'text-center',
+      },
+      {
+        field: 'id',
+        headerName: 'Reporte',
+        width: 90,
+        cellClass: 'text-center',
+      },
+      {
+        field: 'orderId',
+        headerName: 'Orden',
+        width: 100,
+        cellClass: 'text-center',
+        valueFormatter: (p: ValueFormatterParams) => p.value || '-',
+      },
       {
         field: 'orderExternal',
-        headerName: 'Orden',
+        headerName: 'Cio',
         width: 120,
-        valueFormatter: (p) => p.value || '-',
+        cellClass: 'text-center',
+        valueFormatter: (p: ValueFormatterParams) => p.value || '-',
       },
       {
-        field: 'address',
-        headerName: 'Dirección',
-        width: 200,
-        flex: 1,
-        valueFormatter: (p) => p.value || '-',
+        field: 'subscriptionId',
+        headerName: 'Contrato',
+        width: 100,
+        cellClass: 'text-center',
+        valueFormatter: (p: ValueFormatterParams) => p.value || '-',
       },
-      { field: 'oiaName', headerName: 'OIA', width: 150, valueFormatter: (p) => p.value || '-' },
       {
-        field: 'inspectorName',
-        headerName: 'Inspector',
+        field: 'inspectionType',
+        headerName: 'Tipo inspección',
         width: 150,
-        valueFormatter: (p) => p.value || '-',
+        valueFormatter: (p: ValueFormatterParams) => p.value || '-',
       },
       {
-        field: 'status',
-        headerName: 'Estado',
-        width: 120,
-        cellRenderer: () => <Badge variant="warning">Pendiente</Badge>,
+        field: 'oiaName',
+        headerName: 'OIA',
+        width: 150,
+        cellClass: 'text-center',
+        valueFormatter: (p: ValueFormatterParams) => p.value || '-',
+      },
+      {
+        field: 'createdAt',
+        headerName: 'Fecha de creación',
+        width: 140,
+        cellClass: 'text-center',
+        valueFormatter: (p: ValueFormatterParams) => formatDate(p.value),
       },
       {
         field: 'actions',
-        headerName: 'Acciones',
+        headerName: 'Gestionar',
         width: 100,
+        cellClass: 'text-center',
         cellRenderer: (params: { data: PendingReport }) => (
           <Button
-            variant="outline"
+            variant="default"
             size="sm"
+            className="bg-primary hover:bg-primary/90"
             onClick={() => navigate(`/reports/${params.data.id}`)}
           >
-            <Eye className="h-4 w-4" />
+            <ExternalLink className="h-4 w-4" />
           </Button>
         ),
       },
@@ -93,10 +129,6 @@ export function PendingReportsTable({ limit = 10 }: PendingReportsTableProps) {
     []
   );
 
-  const onGridReady = useCallback((_params: GridReadyEvent) => {
-    // Grid is ready
-  }, []);
-
   return (
     <div className="ag-theme-alpine h-[400px] w-full">
       <AgGridReact
@@ -104,7 +136,6 @@ export function PendingReportsTable({ limit = 10 }: PendingReportsTableProps) {
         rowData={data?.data || []}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
-        onGridReady={onGridReady}
         animateRows={true}
         loading={isLoading}
         domLayout="autoHeight"

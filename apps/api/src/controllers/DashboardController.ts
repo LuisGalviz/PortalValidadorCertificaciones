@@ -33,6 +33,7 @@ export class DashboardController {
         data: reports,
       });
     } catch (error) {
+      console.error('Error fetching pending reports:', error);
       res.status(500).json({ success: false, error: 'Error fetching pending reports' });
     }
   }

@@ -11,6 +11,7 @@ import {
   InspectionTypeList,
   Inspector,
   Oia,
+  Order,
   Report,
   ReportFile,
 } from '../models/index.js';
@@ -176,30 +177,44 @@ export class ReportService {
   }
 
   async getPendingReports(limit = 10, oiaId?: number) {
-    const where: Record<string, unknown> = { status: StatusCode.Pending };
+    const where: Record<string, unknown> = {
+      status: StatusCode.Pending,
+      certificateIdOSF: { [Op.not]: null },
+      inspectorId: { [Op.not]: null },
+      oiaId: { [Op.not]: null },
+    };
     if (oiaId) {
       where.oiaId = oiaId;
     }
 
     const reports = await Report.findAll({
+      attributes: ['id', 'orderId', 'subscriptionId', 'orderExternal', 'createdAt'],
       where,
       include: [
-        { model: Oia, as: 'oia', attributes: ['id', 'name'] },
-        { model: Inspector, as: 'inspector', attributes: ['id', 'name'] },
+        { model: Oia, as: 'oia', attributes: ['name'] },
+        { model: Order, as: 'order', attributes: ['taskTypeId'] },
+        { model: InspectionTypeList, as: 'inspectionTypeData', attributes: ['description'] },
       ],
       order: [['createdAt', 'ASC']],
       limit,
     });
 
-    return reports.map((report) => ({
-      id: report.id,
-      orderExternal: report.orderExternal,
-      address: report.address,
-      inspectionDate: report.inspectionDate,
-      oiaName: (report as unknown as { oia?: { name: string } }).oia?.name,
-      inspectorName: (report as unknown as { inspector?: { name: string } }).inspector?.name,
-      createdAt: report.createdAt,
-    }));
+    return reports.map((report) => {
+      const reportData = report as unknown as {
+        oia?: { name: string };
+        order?: { taskTypeId: number };
+        inspectionTypeData?: { description: string };
+      };
+      return {
+        id: report.id,
+        orderId: report.orderId,
+        orderExternal: report.orderExternal,
+        subscriptionId: report.subscriptionId,
+        inspectionType: reportData.inspectionTypeData?.description,
+        oiaName: reportData.oia?.name,
+        createdAt: report.createdAt,
+      };
+    });
   }
 }
 
