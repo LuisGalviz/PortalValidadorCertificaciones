@@ -3,26 +3,21 @@ import { sequelize } from '../config/database.js';
 
 interface CausalAttributes {
   id: number;
-  code: string;
   description: string;
-  active?: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
+  typeCausal: string;
+  active?: boolean | null;
 }
 
-interface CausalCreationAttributes
-  extends Optional<CausalAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
+interface CausalCreationAttributes extends Optional<CausalAttributes, 'id'> {}
 
 export class Causal
   extends Model<CausalAttributes, CausalCreationAttributes>
   implements CausalAttributes
 {
   declare id: number;
-  declare code: string;
   declare description: string;
-  declare active: boolean;
-  declare readonly createdAt: Date;
-  declare readonly updatedAt: Date;
+  declare typeCausal: string;
+  declare active: boolean | null;
 }
 
 Causal.init(
@@ -32,23 +27,23 @@ Causal.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    code: {
+    description: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    description: {
+    typeCausal: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     active: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
-      defaultValue: true,
     },
   },
   {
     sequelize,
     modelName: 'causals',
     tableName: 'causals',
+    timestamps: false,
   }
 );

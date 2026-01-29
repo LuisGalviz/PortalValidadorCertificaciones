@@ -4,7 +4,7 @@ import { sequelize } from '../config/database.js';
 interface PermissionAttributes {
   id: number;
   userId: number;
-  permission?: string | null;
+  permission?: number | null;
   status?: number | null;
   comment?: string | null;
 }
@@ -17,7 +17,7 @@ export class Permission
 {
   declare id: number;
   declare userId: number;
-  declare permission: string | null;
+  declare permission: number | null;
   declare status: number | null;
   declare comment: string | null;
 }
@@ -34,7 +34,7 @@ Permission.init(
       allowNull: false,
     },
     permission: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       allowNull: true,
     },
     status: {

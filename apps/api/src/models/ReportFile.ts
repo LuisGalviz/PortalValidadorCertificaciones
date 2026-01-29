@@ -4,9 +4,10 @@ import { sequelize } from '../config/database.js';
 interface ReportFileAttributes {
   id: number;
   reportId: number;
-  fileType: string;
-  fileName: string;
-  fileUrl: string;
+  name: string;
+  type?: string | null;
+  path?: string | null;
+  fileTypeCode?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -20,9 +21,10 @@ export class ReportFile
 {
   declare id: number;
   declare reportId: number;
-  declare fileType: string;
-  declare fileName: string;
-  declare fileUrl: string;
+  declare name: string;
+  declare type: string | null;
+  declare path: string | null;
+  declare fileTypeCode: string | null;
   declare readonly createdAt: Date;
   declare readonly updatedAt: Date;
 }
@@ -38,22 +40,26 @@ ReportFile.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    fileType: {
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    fileName: {
+    type: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
-    fileUrl: {
+    path: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
+    },
+    fileTypeCode: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {
     sequelize,
     modelName: 'reportFile',
-    tableName: 'reportFiles',
+    tableName: 'report_files',
   }
 );
