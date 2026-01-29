@@ -74,12 +74,13 @@ export function ConstructionCompaniesTable({ search }: ConstructionCompaniesTabl
     () => ({
       resizable: true,
       filter: true,
+      suppressMovable: true,
     }),
     []
   );
 
-  const onGridReady = useCallback((_params: GridReadyEvent) => {
-    // Grid is ready
+  const onGridReady = useCallback((params: GridReadyEvent) => {
+    params.api.sizeColumnsToFit();
   }, []);
 
   const onSortChanged = useCallback((event: SortChangedEvent) => {

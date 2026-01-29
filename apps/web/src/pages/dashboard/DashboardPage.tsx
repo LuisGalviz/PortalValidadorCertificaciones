@@ -50,8 +50,11 @@ export function DashboardPage() {
   ];
 
   return (
-    <PageContainer className="space-y-4 lg:space-y-6 xl:space-y-8 min-w-0" fullHeight={true}>
-      <div className="min-w-0">
+    <PageContainer
+      className="flex flex-col space-y-4 lg:space-y-6 xl:space-y-8 min-w-0 h-full"
+      fullHeight={true}
+    >
+      <div className="min-w-0 flex-shrink-0">
         <h1 className="text-xl lg:text-2xl xl:text-3xl font-bold text-slate-900 truncate">
           Dashboard
         </h1>
@@ -60,20 +63,19 @@ export function DashboardPage() {
         </p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-3 lg:gap-4 xl:gap-6 md:grid-cols-2 lg:grid-cols-4 min-w-0">
+      <div className="grid gap-3 lg:gap-4 xl:gap-6 md:grid-cols-2 lg:grid-cols-4 min-w-0 flex-shrink-0">
         {statCards.map((stat) => (
-          <Card key={stat.title} className="min-w-0">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 xl:pb-3 space-x-2">
+          <Card key={stat.title} className="min-w-0 px-1 py-1">
+            <CardHeader className="flex flex-row items-center justify-between pb-1 xl:pb-2 space-x-2">
               <CardTitle className="text-sm xl:text-base font-medium text-slate-600 truncate">
                 {stat.title}
               </CardTitle>
-              <div className={cn('rounded-full p-2 xl:p-3 flex-shrink-0', stat.bgColor)}>
+              <div className={cn('rounded-full p-1.5 xl:p-2 flex-shrink-0', stat.bgColor)}>
                 <stat.icon className={cn('h-4 w-4 xl:h-5 xl:w-5', stat.color)} />
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl xl:text-3xl 2xl:text-4xl font-bold truncate">
+            <CardContent className="pb-2">
+              <div className="text-xl xl:text-2xl 2xl:text-3xl font-bold truncate">
                 {statsLoading ? '...' : stat.value.toLocaleString()}
               </div>
             </CardContent>
@@ -81,12 +83,11 @@ export function DashboardPage() {
         ))}
       </div>
 
-      {/* Pending Reports Table */}
-      <Card className="min-w-0">
-        <CardHeader>
+      <Card className="min-w-0 flex flex-col overflow-hidden mt-6 lg:mt-8 xl:mt-10">
+        <CardHeader className="flex-shrink-0 py-3 lg:py-4">
           <CardTitle className="text-base lg:text-lg xl:text-xl">Reportes Pendientes</CardTitle>
         </CardHeader>
-        <CardContent className="px-0 sm:px-6">
+        <CardContent className="px-0 sm:px-6 overflow-hidden">
           <PendingReportsTable limit={10} />
         </CardContent>
       </Card>

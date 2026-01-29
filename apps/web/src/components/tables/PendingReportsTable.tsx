@@ -57,47 +57,54 @@ export function PendingReportsTable({ limit = 10 }: PendingReportsTableProps) {
       {
         field: 'id',
         headerName: 'Reporte',
-        width: 90,
+        minWidth: 90,
+        flex: 1,
         cellClass: 'text-center',
       },
       {
         field: 'orderId',
         headerName: 'Orden',
-        width: 100,
+        minWidth: 100,
+        flex: 1,
         cellClass: 'text-center',
         valueFormatter: (p: ValueFormatterParams) => p.value || '-',
       },
       {
         field: 'orderExternal',
         headerName: 'Cio',
-        width: 120,
+        minWidth: 120,
+        flex: 1,
         cellClass: 'text-center',
         valueFormatter: (p: ValueFormatterParams) => p.value || '-',
       },
       {
         field: 'subscriptionId',
         headerName: 'Contrato',
-        width: 100,
+        minWidth: 100,
+        flex: 1,
         cellClass: 'text-center',
         valueFormatter: (p: ValueFormatterParams) => p.value || '-',
       },
       {
         field: 'inspectionType',
         headerName: 'Tipo inspección',
-        width: 150,
+        minWidth: 150,
+        flex: 2,
         valueFormatter: (p: ValueFormatterParams) => p.value || '-',
       },
       {
         field: 'oiaName',
         headerName: 'OIA',
-        width: 150,
+        minWidth: 150,
+        flex: 2,
         cellClass: 'text-center',
         valueFormatter: (p: ValueFormatterParams) => p.value || '-',
       },
       {
         field: 'createdAt',
         headerName: 'Fecha de creación',
-        width: 140,
+        minWidth: 140,
+        flex: 1.5,
         cellClass: 'text-center',
         valueFormatter: (p: ValueFormatterParams) => formatDate(p.value),
       },
@@ -125,12 +132,13 @@ export function PendingReportsTable({ limit = 10 }: PendingReportsTableProps) {
     () => ({
       resizable: true,
       sortable: false,
+      suppressMovable: true,
     }),
     []
   );
 
   return (
-    <div className="ag-theme-alpine w-full min-h-[200px]">
+    <div className="ag-theme-alpine w-full">
       <AgGridReact
         ref={gridRef}
         rowData={data?.data || []}
@@ -139,6 +147,7 @@ export function PendingReportsTable({ limit = 10 }: PendingReportsTableProps) {
         animateRows={true}
         loading={isLoading}
         domLayout="autoHeight"
+        onGridReady={(params) => params.api.sizeColumnsToFit()}
       />
     </div>
   );

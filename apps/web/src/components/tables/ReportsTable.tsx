@@ -131,12 +131,13 @@ export function ReportsTable({ oiaId, status }: ReportsTableProps) {
     () => ({
       resizable: true,
       filter: true,
+      suppressMovable: true,
     }),
     []
   );
 
-  const onGridReady = useCallback((_params: GridReadyEvent) => {
-    // Grid is ready
+  const onGridReady = useCallback((params: GridReadyEvent) => {
+    params.api.sizeColumnsToFit();
   }, []);
 
   const onSortChanged = useCallback((event: SortChangedEvent) => {
@@ -169,7 +170,6 @@ export function ReportsTable({ oiaId, status }: ReportsTableProps) {
         />
       </div>
 
-      {/* Custom Pagination */}
       <div className="flex items-center justify-between px-2">
         <div className="text-sm xl:text-base text-muted-foreground">
           {data?.pagination && (
