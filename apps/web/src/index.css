@@ -52,8 +52,31 @@
 @layer base {
   * {
     @apply border-border;
+    box-sizing: border-box;
   }
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
   body {
     @apply bg-background text-foreground;
+    max-width: 100%;
+  }
+
+  .flex,
+  .grid {
+    min-width: 0;
+    min-height: 0;
+  }
+  img,
+  svg {
+    max-width: 100%;
+    height: auto;
   }
 }

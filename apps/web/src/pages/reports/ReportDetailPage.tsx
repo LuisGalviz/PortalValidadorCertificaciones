@@ -1,3 +1,4 @@
+import { PageContainer } from '@/components/layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -467,14 +468,14 @@ export function ReportDetailPage() {
   }
 
   return (
-    <div className="h-[calc(100vh-7rem)] lg:h-[calc(100vh-8rem)] xl:h-[calc(100vh-9rem)] 2xl:h-[calc(100vh-10rem)] flex flex-col">
+    <PageContainer className="h-full flex flex-col min-w-0" scrollable={true}>
       <div className="flex items-center gap-3 xl:gap-4 pb-2 xl:pb-3 flex-shrink-0">
         <Button variant="ghost" size="sm" onClick={() => navigate('/reports')}>
           <ArrowLeft className="h-4 w-4 xl:h-5 xl:w-5 mr-2" />
           Volver
         </Button>
-        <div className="flex-1">
-          <h1 className="text-lg lg:text-xl xl:text-2xl font-bold text-slate-900">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-lg lg:text-xl xl:text-2xl font-bold text-slate-900 truncate">
             Reporte #{report.id}
           </h1>
         </div>
@@ -482,7 +483,7 @@ export function ReportDetailPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 xl:gap-4 2xl:gap-6 flex-1 min-h-0">
-        <Card className="lg:col-span-7 xl:col-span-8 overflow-hidden">
+        <Card className="lg:col-span-7 xl:col-span-8 overflow-hidden min-h-[400px] lg:min-h-0">
           <CardContent className="p-0 h-full">
             {pdfUrl ? (
               <iframe src={pdfUrl} className="w-full h-full border-0" title="Certificado PDF" />
@@ -494,8 +495,8 @@ export function ReportDetailPage() {
           </CardContent>
         </Card>
 
-        <div className="lg:col-span-5 xl:col-span-4 flex flex-col min-h-0 overflow-hidden">
-          <div className="flex-1 overflow-y-auto space-y-3 xl:space-y-4 pr-1">
+        <div className="lg:col-span-5 xl:col-span-4 flex flex-col min-h-0">
+          <div className="flex-1 overflow-y-auto space-y-3 xl:space-y-4 pr-1 min-w-0">
             <BasicInfoCard report={report} />
             <CheckListCard
               checkList={review.checkList}
@@ -551,6 +552,6 @@ export function ReportDetailPage() {
           </div>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

@@ -14,7 +14,6 @@ import { InspectorStatusCode, Profile } from '@portal/shared';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-
 const statusOptions = [
   { value: 'all', label: 'Todos' },
   { value: String(InspectorStatusCode.Pending), label: 'Pendientes' },
@@ -24,6 +23,8 @@ const statusOptions = [
   { value: String(InspectorStatusCode.Expired), label: 'Vencidos' },
 ];
 
+import { PageContainer } from '@/components/layout';
+
 export function InspectorsListPage() {
   const { user } = useAuth();
   const [search, setSearch] = useState('');
@@ -32,16 +33,18 @@ export function InspectorsListPage() {
   const canCreate = user?.permission === Profile.Admin || user?.permission === Profile.Oia;
 
   return (
-    <div className="space-y-4 lg:space-y-6 xl:space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl lg:text-2xl xl:text-3xl font-bold text-slate-900">Inspectores</h1>
-          <p className="text-sm lg:text-base xl:text-lg text-slate-600">
+    <PageContainer className="space-y-4 lg:space-y-6 xl:space-y-8 min-w-0">
+      <div className="flex items-center justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="text-xl lg:text-2xl xl:text-3xl font-bold text-slate-900 truncate">
+            Inspectores
+          </h1>
+          <p className="text-sm lg:text-base xl:text-lg text-slate-600 truncate">
             Gestión de inspectores certificados
           </p>
         </div>
         {canCreate && (
-          <Button asChild className="xl:h-11 xl:px-6 xl:text-base">
+          <Button asChild className="xl:h-11 xl:px-6 xl:text-base flex-shrink-0">
             <Link to="/inspectors/new">
               <Plus className="h-4 w-4 xl:h-5 xl:w-5 mr-2" />
               Nuevo Inspector
@@ -50,19 +53,19 @@ export function InspectorsListPage() {
         )}
       </div>
 
-      <Card>
+      <Card className="min-w-0">
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
             <CardTitle className="text-base lg:text-lg xl:text-xl">Lista de Inspectores</CardTitle>
-            <div className="flex items-center gap-3 xl:gap-4">
+            <div className="flex items-center gap-3 xl:gap-4 flex-wrap">
               <Input
                 placeholder="Buscar..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-56 lg:w-64 xl:w-72 xl:h-10"
+                className="w-full sm:w-56 lg:w-64 xl:w-72 xl:h-10"
               />
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-36 lg:w-40 xl:w-48 xl:h-10">
+                <SelectTrigger className="w-full sm:w-36 lg:w-40 xl:w-48 xl:h-10">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -76,13 +79,13 @@ export function InspectorsListPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-0 sm:px-6">
           <InspectorsTable
             search={search}
             status={statusFilter === 'all' ? undefined : Number(statusFilter)}
           />
         </CardContent>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

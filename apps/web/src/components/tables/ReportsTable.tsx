@@ -155,7 +155,7 @@ export function ReportsTable({ oiaId, status }: ReportsTableProps) {
 
   return (
     <div className="space-y-4">
-      <div className="ag-theme-alpine h-[500px] lg:h-[550px] xl:h-[600px] 2xl:h-[700px] w-full">
+      <div className="ag-theme-alpine h-[450px] lg:h-[calc(100vh-380px)] xl:h-[calc(100vh-400px)] min-h-[350px] w-full">
         <AgGridReact
           ref={gridRef}
           rowData={data?.data || []}

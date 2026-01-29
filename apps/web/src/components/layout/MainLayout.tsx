@@ -8,15 +8,16 @@ export function MainLayout() {
   const { state, isMobileOpen, closeMobile } = useSidebar();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50">
+    <div className="flex h-full overflow-hidden bg-slate-50">
       <div
         className={cn(
-          'hidden lg:flex flex-col border-r bg-slate-900 transition-all duration-300 ease-in-out',
+          'hidden lg:flex flex-col border-r bg-slate-900 transition-all duration-300 ease-in-out flex-shrink-0',
           state === 'expanded' ? 'w-64 xl:w-72 2xl:w-80' : 'w-20'
         )}
       >
         <Sidebar />
       </div>
+      {/* Mobile Drawer remains as is, but ensuring sidebar inside is correct */}
       <div
         className={cn(
           'fixed inset-0 z-50 flex lg:hidden transition-opacity duration-300 ease-in-out',
@@ -39,7 +40,7 @@ export function MainLayout() {
         />
         <div
           className={cn(
-            'relative flex w-full max-w-xs flex-col bg-slate-900 transition-transform duration-300 ease-in-out',
+            'relative flex w-full max-w-xs flex-col bg-slate-900 transition-transform duration-300 ease-in-out flex-shrink-0',
             isMobileOpen ? 'translate-x-0' : '-translate-x-full'
           )}
         >
@@ -47,9 +48,9 @@ export function MainLayout() {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex flex-1 flex-col min-w-0 h-full overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6 xl:p-8 2xl:p-10">
+        <main className="flex-1 overflow-auto min-h-0 flex flex-col">
           <Outlet />
         </main>
       </div>
