@@ -1,4 +1,5 @@
 import { AuthProvider } from '@/features/auth';
+import { SidebarProvider } from '@/hooks';
 import { router } from '@/routes';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from 'react-router-dom';
@@ -17,7 +18,9 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <RouterProvider router={router} />
+        <SidebarProvider>
+          <RouterProvider router={router} />
+        </SidebarProvider>
         <Toaster
           position="top-right"
           richColors
