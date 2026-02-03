@@ -1,7 +1,6 @@
 import { PageContainer, usePageHeader } from '@/components/layout';
 import { OiaUsersTable } from '@/components/tables';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -279,27 +278,28 @@ export function OiaUsersListPage() {
   }
 
   return (
-    <PageContainer className="space-y-4 lg:space-y-6 xl:space-y-8 min-w-0">
-      <Card className="min-w-0">
-        <CardHeader>
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <CardTitle className="text-base lg:text-lg xl:text-xl">Listado de usuarios</CardTitle>
-            {canEdit && (
-              <Button onClick={openCreateModal} className="w-full sm:w-auto xl:h-10 xl:px-4">
-                Crear usuario
-              </Button>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="px-0 sm:px-6">
+    <PageContainer className="min-w-0" fullHeight={true}>
+      <div className="min-w-0 flex flex-col flex-1 min-h-0 space-y-3 lg:space-y-4">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <h2 className="text-base lg:text-lg xl:text-xl font-semibold text-slate-900">
+            Listado de usuarios
+          </h2>
+          {canEdit && (
+            <Button onClick={openCreateModal} className="w-full sm:w-auto xl:h-10 xl:px-4">
+              Crear usuario
+            </Button>
+          )}
+        </div>
+
+        <div className="min-w-0 flex-1 min-h-0">
           <OiaUsersTable
             oiaId={oiaId}
             onView={(userId) => openUserModal(userId, 'view')}
             onEdit={(userId) => openUserModal(userId, 'edit')}
             canEdit={canEdit}
           />
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">

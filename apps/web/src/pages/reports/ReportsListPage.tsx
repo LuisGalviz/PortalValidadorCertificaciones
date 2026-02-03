@@ -1,7 +1,6 @@
 import { PageContainer, usePageHeader } from '@/components/layout';
 import { ReportsTable } from '@/components/tables/ReportsTable';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -37,42 +36,43 @@ export function ReportsListPage() {
   const status = statusFilter === 'all' ? undefined : Number(statusFilter);
 
   return (
-    <PageContainer className="space-y-4 lg:space-y-6 xl:space-y-8 min-w-0">
-      <Card className="min-w-0">
-        <CardHeader>
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <CardTitle className="text-base lg:text-lg xl:text-xl">Lista de Reportes</CardTitle>
-            <div className="flex items-center gap-3 xl:gap-4 flex-wrap w-full sm:w-auto">
-              <div className="flex items-center gap-2 xl:gap-3">
-                <span className="text-sm xl:text-base text-slate-600">Estado:</span>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-36 lg:w-40 xl:w-48 xl:h-10">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statusOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              {canCreateReport && (
-                <Button asChild className="w-full sm:w-auto xl:h-10 xl:px-4">
-                  <Link to="/reports/new">
-                    <Plus className="h-4 w-4 xl:h-5 xl:w-5 mr-2" />
-                    Nuevo Reporte
-                  </Link>
-                </Button>
-              )}
+    <PageContainer className="min-w-0" fullHeight={true}>
+      <div className="min-w-0 flex flex-col flex-1 min-h-0 space-y-3 lg:space-y-4">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <h2 className="text-base lg:text-lg xl:text-xl font-semibold text-slate-900">
+            Lista de Reportes
+          </h2>
+          <div className="flex items-center gap-3 xl:gap-4 flex-wrap w-full sm:w-auto">
+            <div className="flex items-center gap-2 xl:gap-3">
+              <span className="text-sm xl:text-base text-slate-600">Estado:</span>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-36 lg:w-40 xl:w-48 xl:h-10">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {statusOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
+            {canCreateReport && (
+              <Button asChild className="w-full sm:w-auto xl:h-10 xl:px-4">
+                <Link to="/reports/new">
+                  <Plus className="h-4 w-4 xl:h-5 xl:w-5 mr-2" />
+                  Nuevo Reporte
+                </Link>
+              </Button>
+            )}
           </div>
-        </CardHeader>
-        <CardContent className="px-0 sm:px-6">
+        </div>
+
+        <div className="min-w-0 flex-1 min-h-0">
           <ReportsTable status={status} />
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </PageContainer>
   );
 }

@@ -99,7 +99,7 @@ export function ConstructionCompaniesTable({ search }: ConstructionCompaniesTabl
 
   return (
     <div className="space-y-4">
-      <div className="ag-theme-alpine h-[450px] lg:h-[calc(100vh-380px)] xl:h-[calc(100vh-400px)] min-h-[350px] w-full">
+      <div className="ag-theme-alpine h-[420px] sm:h-[480px] md:h-[calc(100vh-360px)] lg:h-[calc(100vh-320px)] xl:h-[calc(100vh-280px)] 2xl:h-[calc(100vh-240px)] min-h-[350px] w-full">
         <AgGridReact
           ref={gridRef}
           rowData={data?.data || []}
