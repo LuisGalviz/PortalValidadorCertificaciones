@@ -59,6 +59,98 @@ interface OiaFormData {
   userEmail: string;
 }
 
+const emptyFormData: OiaFormData = {
+  name: '',
+  codeAcred: '',
+  effectiveDate: '',
+  typeOrganismId: '',
+  addressOrganism: '',
+  cedRepLegal: '',
+  nameRepLegal: '',
+  addressRepLegal: '',
+  nameContact: '',
+  phoneContact: '',
+  phoneContactAlternative: '',
+  userName: '',
+  userPhone: '',
+  userEmail: '',
+};
+
+function toInputDate(value?: string | Date | null): string {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toISOString().split('T')[0];
+}
+
+function toStringValue(value?: string | number | null): string {
+  if (value === null || value === undefined) return '';
+  return String(value);
+}
+
+function mapOiaToFormData(oiaData: OiaWithExtras): OiaFormData {
+  return {
+    name: oiaData.name ?? '',
+    codeAcred: oiaData.codeAcred ?? '',
+    effectiveDate: toInputDate(oiaData.effectiveDate),
+    typeOrganismId: toStringValue(oiaData.typeOrganismId),
+    addressOrganism: oiaData.addressOrganism ?? '',
+    cedRepLegal: toStringValue(oiaData.cedRepLegal),
+    nameRepLegal: oiaData.nameRepLegal ?? '',
+    addressRepLegal: oiaData.addressRepLegal ?? '',
+    nameContact: oiaData.nameContact ?? '',
+    phoneContact: toStringValue(oiaData.phoneContact),
+    phoneContactAlternative: toStringValue(oiaData.phoneContactAlternative),
+    userName: oiaData.notificationUser?.name ?? '',
+    userPhone: toStringValue(oiaData.notificationUser?.phone),
+    userEmail: oiaData.notificationUser?.email ?? '',
+  };
+}
+
+function getResponseData<T>(response: ApiResponse<T>): T | null {
+  if (!response.success || !response.data) return null;
+  return response.data;
+}
+
+function getValidationError(data: OiaFormData): string | null {
+  if (!data.userName) return 'El nombre del usuario es requerido';
+  if (!data.userPhone) return 'El celular de notificación es requerido';
+  if (!data.userEmail) return 'El correo de notificación es requerido';
+  return null;
+}
+
+function appendIfValue(form: FormData, key: string, value: string) {
+  if (value) form.append(key, value);
+}
+
+function buildMultipartData(
+  data: OiaFormData,
+  files: { fileOnac: File | null; fileCRT: File | null }
+): FormData {
+  const multipartData = new FormData();
+
+  multipartData.append('name', data.name);
+  multipartData.append('codeAcred', data.codeAcred);
+  appendIfValue(multipartData, 'effectiveDate', data.effectiveDate);
+  appendIfValue(multipartData, 'cedRepLegal', data.cedRepLegal);
+  appendIfValue(multipartData, 'nameRepLegal', data.nameRepLegal);
+  appendIfValue(multipartData, 'addressRepLegal', data.addressRepLegal);
+  appendIfValue(multipartData, 'typeOrganismId', data.typeOrganismId);
+  appendIfValue(multipartData, 'addressOrganism', data.addressOrganism);
+  appendIfValue(multipartData, 'nameContact', data.nameContact);
+  appendIfValue(multipartData, 'phoneContact', data.phoneContact);
+  appendIfValue(multipartData, 'phoneContactAlternative', data.phoneContactAlternative);
+
+  multipartData.append('userName', data.userName);
+  multipartData.append('userPhone', data.userPhone);
+  multipartData.append('userEmail', data.userEmail);
+
+  if (files.fileOnac) multipartData.append('fileOnac', files.fileOnac);
+  if (files.fileCRT) multipartData.append('fileCRT', files.fileCRT);
+
+  return multipartData;
+}
+
 export function MyOiaPage() {
   const [oia, setOia] = useState<OiaWithExtras | null>(null);
   const [typeOrganisms, setTypeOrganisms] = useState<TypeOrganism[]>([]);
@@ -67,22 +159,7 @@ export function MyOiaPage() {
   const [fileOnac, setFileOnac] = useState<File | null>(null);
   const [fileCRT, setFileCRT] = useState<File | null>(null);
 
-  const [formData, setFormData] = useState<OiaFormData>({
-    name: '',
-    codeAcred: '',
-    effectiveDate: '',
-    typeOrganismId: '',
-    addressOrganism: '',
-    cedRepLegal: '',
-    nameRepLegal: '',
-    addressRepLegal: '',
-    nameContact: '',
-    phoneContact: '',
-    phoneContactAlternative: '',
-    userName: '',
-    userPhone: '',
-    userEmail: '',
-  });
+  const [formData, setFormData] = useState<OiaFormData>(emptyFormData);
 
   const loadData = useCallback(async () => {
     try {
@@ -93,33 +170,15 @@ export function MyOiaPage() {
         api.get<ApiResponse<TypeOrganism[]>>('/catalogs/type-organisms'),
       ]);
 
-      if (typesResponse.success && typesResponse.data) {
-        setTypeOrganisms(typesResponse.data);
+      const typesData = getResponseData(typesResponse);
+      if (typesData) {
+        setTypeOrganisms(typesData);
       }
 
-      if (oiaResponse.success && oiaResponse.data) {
-        const oiaData = oiaResponse.data;
+      const oiaData = getResponseData(oiaResponse);
+      if (oiaData) {
         setOia(oiaData);
-        setFormData({
-          name: oiaData.name || '',
-          codeAcred: oiaData.codeAcred || '',
-          effectiveDate: oiaData.effectiveDate
-            ? new Date(oiaData.effectiveDate).toISOString().split('T')[0]
-            : '',
-          typeOrganismId: oiaData.typeOrganismId?.toString() || '',
-          addressOrganism: oiaData.addressOrganism || '',
-          cedRepLegal: oiaData.cedRepLegal?.toString() || '',
-          nameRepLegal: oiaData.nameRepLegal || '',
-          addressRepLegal: oiaData.addressRepLegal || '',
-          // Información de Contacto (OIA)
-          nameContact: oiaData.nameContact || '',
-          phoneContact: oiaData.phoneContact?.toString() || '',
-          phoneContactAlternative: oiaData.phoneContactAlternative?.toString() || '',
-          // Información de Notificación (Usuario)
-          userName: oiaData.notificationUser?.name || '',
-          userPhone: oiaData.notificationUser?.phone?.toString() || '',
-          userEmail: oiaData.notificationUser?.email || '',
-        });
+        setFormData(mapOiaToFormData(oiaData));
       }
     } catch (err) {
       showError(err instanceof Error ? err.message : 'Error al cargar datos');
@@ -155,51 +214,16 @@ export function MyOiaPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    // Validaciones
-    if (!formData.userName) {
-      showError('El nombre del usuario es requerido');
-      return;
-    }
-
-    if (!formData.userPhone) {
-      showError('El celular de notificación es requerido');
-      return;
-    }
-
-    if (!formData.userEmail) {
-      showError('El correo de notificación es requerido');
+    const validationError = getValidationError(formData);
+    if (validationError) {
+      showError(validationError);
       return;
     }
 
     try {
       setSaving(true);
 
-      const multipartData = new FormData();
-
-      // OIA data
-      multipartData.append('name', formData.name);
-      multipartData.append('codeAcred', formData.codeAcred);
-      if (formData.effectiveDate) multipartData.append('effectiveDate', formData.effectiveDate);
-      if (formData.cedRepLegal) multipartData.append('cedRepLegal', formData.cedRepLegal);
-      if (formData.nameRepLegal) multipartData.append('nameRepLegal', formData.nameRepLegal);
-      if (formData.addressRepLegal)
-        multipartData.append('addressRepLegal', formData.addressRepLegal);
-      if (formData.typeOrganismId) multipartData.append('typeOrganismId', formData.typeOrganismId);
-      if (formData.addressOrganism)
-        multipartData.append('addressOrganism', formData.addressOrganism);
-      if (formData.nameContact) multipartData.append('nameContact', formData.nameContact);
-      if (formData.phoneContact) multipartData.append('phoneContact', formData.phoneContact);
-      if (formData.phoneContactAlternative)
-        multipartData.append('phoneContactAlternative', formData.phoneContactAlternative);
-
-      // User notification data
-      multipartData.append('userName', formData.userName);
-      multipartData.append('userPhone', formData.userPhone);
-      multipartData.append('userEmail', formData.userEmail);
-
-      // Files
-      if (fileOnac) multipartData.append('fileOnac', fileOnac);
-      if (fileCRT) multipartData.append('fileCRT', fileCRT);
+      const multipartData = buildMultipartData(formData, { fileOnac, fileCRT });
 
       const response = await api.put<ApiResponse<OiaWithExtras> & { message?: string }>(
         '/oias/me',
