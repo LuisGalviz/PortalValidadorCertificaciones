@@ -4,9 +4,11 @@ import { useCallback, useMemo, useRef } from 'react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { api } from '@/lib/api';
 import type { ApiResponse } from '@portal/shared';
 import { useQuery } from '@tanstack/react-query';
+import { Eye, Pencil } from 'lucide-react';
 
 interface OiaUserListItem {
   id: number;
@@ -22,6 +24,9 @@ interface OiaUsersResponse extends ApiResponse<OiaUserListItem[]> {}
 
 interface OiaUsersTableProps {
   oiaId: number;
+  onView?: (userId: number) => void;
+  onEdit?: (userId: number) => void;
+  canEdit?: boolean;
 }
 
 function formatDateTime(value?: string | Date | null) {
@@ -37,7 +42,7 @@ function formatDateTime(value?: string | Date | null) {
   });
 }
 
-export function OiaUsersTable({ oiaId }: OiaUsersTableProps) {
+export function OiaUsersTable({ oiaId, onView, onEdit, canEdit }: OiaUsersTableProps) {
   const gridRef = useRef<AgGridReact>(null);
 
   const { data, isLoading } = useQuery({
@@ -80,12 +85,41 @@ export function OiaUsersTable({ oiaId }: OiaUsersTableProps) {
       {
         field: 'actions',
         headerName: 'Acciones',
-        width: 120,
+        width: 140,
         sortable: false,
-        valueFormatter: () => '-',
+        cellRenderer: (params: { data: OiaUserListItem }) => {
+          if (!onView && !onEdit) {
+            return <span>-</span>;
+          }
+
+          return (
+            <div className="flex items-center gap-2">
+              {onView && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onView(params.data.id)}
+                  title="Ver"
+                >
+                  <Eye className="h-4 w-4" />
+                </Button>
+              )}
+              {canEdit && onEdit && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onEdit(params.data.id)}
+                  title="Editar"
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          );
+        },
       },
     ],
-    []
+    [onView, onEdit, canEdit]
   );
 
   const defaultColDef = useMemo<ColDef>(

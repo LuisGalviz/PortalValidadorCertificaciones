@@ -57,8 +57,17 @@ export const updateOwnOiaSchema = z.object({
   userEmail: z.string().email(),
 });
 
+export const oiaUserSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email(),
+  authEmail: z.string().email().optional().or(z.literal('')),
+  phone: z.coerce.number().int(),
+  active: z.coerce.boolean(),
+});
+
 export type OiaFilterInput = z.infer<typeof oiaFilterSchema>;
 export type CreateOiaInput = z.infer<typeof createOiaSchema>;
 export type UpdateOiaInput = z.infer<typeof updateOiaSchema>;
 export type UpdateOwnOiaInput = z.infer<typeof updateOwnOiaSchema>;
 export type RegisterOiaInput = z.infer<typeof registerOiaSchema>;
+export type OiaUserInput = z.infer<typeof oiaUserSchema>;

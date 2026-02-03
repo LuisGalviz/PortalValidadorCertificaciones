@@ -10,7 +10,12 @@ import {
   TypeOrganism,
   User,
 } from '../models/index.js';
-import type { CreateOiaInput, OiaFilterInput, UpdateOiaInput } from '../validators/oia.js';
+import type {
+  CreateOiaInput,
+  OiaFilterInput,
+  OiaUserInput,
+  UpdateOiaInput,
+} from '../validators/oia.js';
 import { s3Service } from './S3Service.js';
 
 const getStatusName = (status: number): string => {
@@ -230,6 +235,147 @@ export class OiaService {
         permission: (user as unknown as { permission?: Permission }).permission?.permission,
       };
     });
+  }
+
+  async getUser(oiaId: number, userId: number) {
+    const oiaUser = await OiaUsers.findOne({
+      where: { oiaId, userId },
+      include: [{ model: User, as: 'user' }],
+    });
+
+    if (!oiaUser) return null;
+    const user = (oiaUser as unknown as { user: User }).user;
+    if (!user) return null;
+
+    return {
+      id: user.id,
+      name: user.name,
+      authEmail: user.authEmail,
+      email: user.email,
+      phone: user.phone,
+      active: user.active,
+      createdAt: user.createdAt,
+    };
+  }
+
+  async createUser(oiaId: number, data: OiaUserInput) {
+    const transaction = await Oia.sequelize?.transaction();
+    if (!transaction) {
+      throw new Error('No se pudo iniciar la transacción');
+    }
+
+    try {
+      const oia = await Oia.findByPk(oiaId, { transaction });
+      if (!oia) {
+        await transaction.rollback();
+        return null;
+      }
+
+      const authEmail = data.authEmail ? data.authEmail.trim() : null;
+
+      if (authEmail) {
+        const existingAuth = await User.findOne({ where: { authEmail }, transaction });
+        if (existingAuth) {
+          throw new Error('El correo de acceso ya está asociado a otro usuario');
+        }
+      }
+
+      const user = await User.create(
+        {
+          name: data.name.trim(),
+          shortName: data.name.trim(),
+          phone: data.phone,
+          email: data.email.trim(),
+          authEmail,
+          active: data.active,
+        },
+        { transaction }
+      );
+
+      await OiaUsers.create(
+        {
+          oiaId,
+          userId: user.id,
+          createdAt: new Date(),
+        },
+        { transaction }
+      );
+
+      await transaction.commit();
+
+      return {
+        id: user.id,
+        name: user.name,
+        authEmail: user.authEmail,
+        email: user.email,
+        phone: user.phone,
+        active: user.active,
+        createdAt: user.createdAt,
+      };
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+  }
+
+  async updateUser(oiaId: number, userId: number, data: OiaUserInput) {
+    const transaction = await Oia.sequelize?.transaction();
+    if (!transaction) {
+      throw new Error('No se pudo iniciar la transacción');
+    }
+
+    try {
+      const oiaUser = await OiaUsers.findOne({ where: { oiaId, userId }, transaction });
+      if (!oiaUser) {
+        await transaction.rollback();
+        return null;
+      }
+
+      const user = await User.findByPk(userId, { transaction });
+      if (!user) {
+        await transaction.rollback();
+        return null;
+      }
+
+      const authEmail = data.authEmail ? data.authEmail.trim() : null;
+
+      if (authEmail) {
+        const existingAuth = await User.findOne({
+          where: { authEmail, id: { [Op.ne]: userId } },
+          transaction,
+        });
+        if (existingAuth) {
+          throw new Error('El correo de acceso ya está asociado a otro usuario');
+        }
+      }
+
+      await user.update(
+        {
+          name: data.name.trim(),
+          shortName: data.name.trim(),
+          phone: data.phone,
+          email: data.email.trim(),
+          authEmail,
+          active: data.active,
+        },
+        { transaction }
+      );
+
+      await transaction.commit();
+
+      return {
+        id: user.id,
+        name: user.name,
+        authEmail: user.authEmail,
+        email: user.email,
+        phone: user.phone,
+        active: user.active,
+        createdAt: user.createdAt,
+      };
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
   }
 
   async findByIdentification(identification: number) {

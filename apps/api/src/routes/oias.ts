@@ -58,5 +58,14 @@ router.put(
 router.get('/:id/users', ensureAuthenticated, canReadOias, (req, res, next) =>
   oiaController.getUsers(req, res, next)
 );
+router.get('/:id/users/:userId', ensureAuthenticated, canReadOias, (req, res, next) =>
+  oiaController.getUser(req, res, next)
+);
+router.post('/:id/users', ensureAuthenticated, canUpdateOias, (req, res, next) =>
+  oiaController.createUser(req, res, next)
+);
+router.put('/:id/users/:userId', ensureAuthenticated, canUpdateOias, (req, res, next) =>
+  oiaController.updateUser(req, res, next)
+);
 
 export default router;

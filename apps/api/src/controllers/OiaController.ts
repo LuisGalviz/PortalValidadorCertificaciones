@@ -10,9 +10,11 @@ import {
   createOiaSchema,
   idParamSchema,
   oiaFilterSchema,
+  oiaUserSchema,
   registerOiaSchema,
   updateOiaSchema,
   updateOwnOiaSchema,
+  userIdParamSchema,
 } from '../validators/index.js';
 
 type MulterFile = {
@@ -399,6 +401,78 @@ export class OiaController {
     } catch (error) {
       handleControllerError(error, next, 'Error fetching OIA users', {
         zodMessage: 'Invalid OIA ID',
+      });
+    }
+  }
+
+  async getUser(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = idParamSchema.parse(req.params);
+      const { userId } = userIdParamSchema.parse(req.params);
+
+      const user = await oiaService.getUser(id, userId);
+
+      if (!user) {
+        res.status(404).json({ success: false, error: 'User not found' });
+        return;
+      }
+
+      res.json({
+        success: true,
+        data: user,
+      });
+    } catch (error) {
+      handleControllerError(error, next, 'Error fetching OIA user', {
+        zodMessage: 'Invalid user data',
+      });
+    }
+  }
+
+  async createUser(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = idParamSchema.parse(req.params);
+      const data = oiaUserSchema.parse(req.body);
+
+      const user = await oiaService.createUser(id, data);
+
+      if (!user) {
+        res.status(404).json({ success: false, error: 'OIA not found' });
+        return;
+      }
+
+      res.status(201).json({
+        success: true,
+        data: user,
+        message: 'Usuario creado correctamente',
+      });
+    } catch (error) {
+      handleControllerError(error, next, 'Error creating OIA user', {
+        zodMessage: 'Invalid user data',
+      });
+    }
+  }
+
+  async updateUser(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = idParamSchema.parse(req.params);
+      const { userId } = userIdParamSchema.parse(req.params);
+      const data = oiaUserSchema.parse(req.body);
+
+      const user = await oiaService.updateUser(id, userId, data);
+
+      if (!user) {
+        res.status(404).json({ success: false, error: 'User not found' });
+        return;
+      }
+
+      res.json({
+        success: true,
+        data: user,
+        message: 'Usuario actualizado correctamente',
+      });
+    } catch (error) {
+      handleControllerError(error, next, 'Error updating OIA user', {
+        zodMessage: 'Invalid user data',
       });
     }
   }
