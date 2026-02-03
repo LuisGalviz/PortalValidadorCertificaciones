@@ -210,9 +210,11 @@ export class OiaService {
       include: [
         {
           model: User,
+          as: 'user',
           include: [{ model: Permission, as: 'permission' }],
         },
       ],
+      order: [[{ model: User, as: 'user' }, 'createdAt', 'DESC']],
     });
 
     return oiaUsers.map((ou) => {
@@ -220,9 +222,11 @@ export class OiaService {
       return {
         id: user.id,
         name: user.name,
+        authEmail: user.authEmail,
         email: user.email,
         phone: user.phone,
         active: user.active,
+        createdAt: user.createdAt,
         permission: (user as unknown as { permission?: Permission }).permission?.permission,
       };
     });

@@ -9,6 +9,18 @@ import { ArrowLeft } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
+async function fetchOiaName(id: string): Promise<string | null> {
+  try {
+    const response = await api.get<ApiResponse<Oia>>(`/oias/${id}`);
+    if (response.success && response.data?.name) {
+      return response.data.name;
+    }
+  } catch (err) {
+    showError(err instanceof Error ? err.message : 'Error al cargar OIA');
+  }
+  return null;
+}
+
 export function OiaUsersListPage() {
   const { id } = useParams();
   const oiaId = Number(id);
@@ -16,23 +28,18 @@ export function OiaUsersListPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!id || Number.isNaN(oiaId)) {
+      setLoading(false);
+      return;
+    }
+
+    const oiaIdParam = id;
     let isMounted = true;
     async function loadOia() {
-      if (!id || Number.isNaN(oiaId)) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const response = await api.get<ApiResponse<Oia>>(`/oias/${id}`);
-        if (response.success && response.data && isMounted) {
-          setOiaName(response.data.name);
-        }
-      } catch (err) {
-        showError(err instanceof Error ? err.message : 'Error al cargar OIA');
-      } finally {
-        if (isMounted) setLoading(false);
-      }
+      const name = await fetchOiaName(oiaIdParam);
+      if (!isMounted) return;
+      if (name) setOiaName(name);
+      setLoading(false);
     }
 
     loadOia();

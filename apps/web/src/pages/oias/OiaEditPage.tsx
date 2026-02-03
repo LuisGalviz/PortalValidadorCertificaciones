@@ -124,6 +124,38 @@ function mapOiaToFormData(oiaData: OiaWithExtras): OiaEditFormData {
   };
 }
 
+function mapOrganismCodes(raw: unknown): OrganismCode[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.map((item) => ({
+    gasera: normalizeGasera(String(item?.gasera ?? '')),
+    codigo: String(item?.codigo ?? ''),
+  }));
+}
+
+async function fetchTypeOrganismsData(): Promise<TypeOrganism[] | null> {
+  try {
+    const response = await api.get<ApiResponse<TypeOrganism[]>>('/catalogs/type-organisms');
+    if (response.success && response.data) {
+      return response.data;
+    }
+  } catch (err) {
+    showError(err instanceof Error ? err.message : 'Error al cargar catálogos');
+  }
+  return null;
+}
+
+async function fetchOiaData(id: string): Promise<OiaWithExtras | null> {
+  try {
+    const response = await api.get<ApiResponse<OiaWithExtras>>(`/oias/${id}`, { includeFiles: 1 });
+    if (response.success && response.data) {
+      return response.data;
+    }
+  } catch (err) {
+    showError(err instanceof Error ? err.message : 'Error al cargar datos');
+  }
+  return null;
+}
+
 function appendIfValue(form: FormData, key: string, value?: string) {
   if (value !== undefined && value !== null && value !== '') {
     form.append(key, value);
@@ -187,41 +219,33 @@ export function OiaEditPage() {
   );
 
   useEffect(() => {
+    if (!id || Number.isNaN(oiaId)) {
+      setLoading(false);
+      return;
+    }
+
+    const oiaIdParam = id;
     let isMounted = true;
 
     async function loadData() {
-      if (!id || Number.isNaN(oiaId)) {
-        setLoading(false);
-        return;
+      const [typesData, oiaData] = await Promise.all([
+        fetchTypeOrganismsData(),
+        fetchOiaData(oiaIdParam),
+      ]);
+
+      if (!isMounted) return;
+
+      if (typesData) {
+        setTypeOrganisms(typesData);
       }
 
-      try {
-        const [typesResponse, oiaResponse] = await Promise.all([
-          api.get<ApiResponse<TypeOrganism[]>>('/catalogs/type-organisms'),
-          api.get<ApiResponse<OiaWithExtras>>(`/oias/${id}`, { includeFiles: 1 }),
-        ]);
-
-        if (typesResponse.success && typesResponse.data && isMounted) {
-          setTypeOrganisms(typesResponse.data);
-        }
-
-        if (oiaResponse.success && oiaResponse.data && isMounted) {
-          setOia(oiaResponse.data);
-          setFormData(mapOiaToFormData(oiaResponse.data));
-          const rawCodes = oiaResponse.data.organismCodes;
-          const codes = Array.isArray(rawCodes) ? (rawCodes as OrganismCode[]) : [];
-          setOrganismCodes(
-            codes.map((item) => ({
-              gasera: normalizeGasera(String(item.gasera ?? '')),
-              codigo: String(item.codigo ?? ''),
-            }))
-          );
-        }
-      } catch (err) {
-        showError(err instanceof Error ? err.message : 'Error al cargar datos');
-      } finally {
-        if (isMounted) setLoading(false);
+      if (oiaData) {
+        setOia(oiaData);
+        setFormData(mapOiaToFormData(oiaData));
+        setOrganismCodes(mapOrganismCodes(oiaData.organismCodes));
       }
+
+      setLoading(false);
     }
 
     loadData();

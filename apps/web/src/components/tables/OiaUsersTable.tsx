@@ -3,18 +3,19 @@ import { AgGridReact } from 'ag-grid-react';
 import { useCallback, useMemo, useRef } from 'react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { Badge } from '@/components/ui/badge';
 import { api } from '@/lib/api';
 import type { ApiResponse } from '@portal/shared';
-import { ProfileNames } from '@portal/shared';
 import { useQuery } from '@tanstack/react-query';
 
 interface OiaUserListItem {
   id: number;
   name: string;
+  authEmail?: string | null;
   email: string;
   phone: number | string | null;
   active: boolean | null;
-  permission?: string | number | null;
+  createdAt?: string | Date | null;
 }
 
 interface OiaUsersResponse extends ApiResponse<OiaUserListItem[]> {}
@@ -23,10 +24,17 @@ interface OiaUsersTableProps {
   oiaId: number;
 }
 
-function formatPermission(value: OiaUserListItem['permission']) {
-  if (value === null || value === undefined) return '-';
-  const key = String(value);
-  return ProfileNames[key] || key;
+function formatDateTime(value?: string | Date | null) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleString('es-CO', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 export function OiaUsersTable({ oiaId }: OiaUsersTableProps) {
@@ -39,21 +47,42 @@ export function OiaUsersTable({ oiaId }: OiaUsersTableProps) {
 
   const columnDefs = useMemo<ColDef[]>(
     () => [
-      { field: 'id', headerName: 'ID', width: 80, sortable: true },
       { field: 'name', headerName: 'Nombre', width: 220, sortable: true, flex: 1 },
-      { field: 'email', headerName: 'Correo', width: 240 },
-      { field: 'phone', headerName: 'Teléfono', width: 140 },
       {
-        field: 'permission',
-        headerName: 'Perfil',
-        width: 140,
-        valueFormatter: (params) => formatPermission(params.value),
+        field: 'authEmail',
+        headerName: 'Correo de acceso',
+        width: 230,
+        valueFormatter: (params) => (params.value ? String(params.value) : ''),
       },
       {
+        field: 'email',
+        headerName: 'Correo de notificaciones',
+        width: 230,
+        valueFormatter: (params) => (params.value ? String(params.value) : ''),
+      },
+      { field: 'phone', headerName: 'Teléfono', width: 140 },
+      {
         field: 'active',
-        headerName: 'Activo',
-        width: 110,
-        valueFormatter: (params) => (params.value ? 'SI' : 'NO'),
+        headerName: 'Estado',
+        width: 130,
+        cellRenderer: (params: { value: boolean | null }) => (
+          <Badge variant={params.value ? 'success' : 'secondary'}>
+            {params.value ? 'Activo' : 'Inactivo'}
+          </Badge>
+        ),
+      },
+      {
+        field: 'createdAt',
+        headerName: 'Fecha de creación',
+        width: 170,
+        valueFormatter: (params) => formatDateTime(params.value),
+      },
+      {
+        field: 'actions',
+        headerName: 'Acciones',
+        width: 120,
+        sortable: false,
+        valueFormatter: () => '-',
       },
     ],
     []
