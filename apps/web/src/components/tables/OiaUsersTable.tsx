@@ -4,7 +4,6 @@ import { useCallback, useMemo, useRef } from 'react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { api } from '@/lib/api';
 import type { ApiResponse } from '@portal/shared';
 import { useQuery } from '@tanstack/react-query';
@@ -95,24 +94,26 @@ export function OiaUsersTable({ oiaId, onView, onEdit, canEdit }: OiaUsersTableP
           return (
             <div className="flex items-center gap-2">
               {onView && (
-                <Button
-                  variant="outline"
-                  size="sm"
+                <button
+                  type="button"
                   onClick={() => onView(params.data.id)}
-                  title="Ver"
+                  title="Ver usuario"
+                  aria-label="Ver usuario"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
                 >
                   <Eye className="h-4 w-4" />
-                </Button>
+                </button>
               )}
               {canEdit && onEdit && (
-                <Button
-                  variant="outline"
-                  size="sm"
+                <button
+                  type="button"
                   onClick={() => onEdit(params.data.id)}
-                  title="Editar"
+                  title="Editar usuario"
+                  aria-label="Editar usuario"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
                 >
                   <Pencil className="h-4 w-4" />
-                </Button>
+                </button>
               )}
             </div>
           );

@@ -126,34 +126,37 @@ export function OiasTable({ search, status, canEdit, canInspectors, canUsers }: 
         cellRenderer: (params: { data: OiaListItem }) => (
           <div className="flex items-center gap-2">
             {canEdit && (
-              <Button
-                variant="outline"
-                size="sm"
+              <button
+                type="button"
                 onClick={() => navigate(`/oias/${params.data.id}`)}
                 title="Editar OIA"
+                aria-label="Editar OIA"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
               >
                 <Pencil className="h-4 w-4" />
-              </Button>
+              </button>
             )}
             {canInspectors && (
-              <Button
-                variant="outline"
-                size="sm"
+              <button
+                type="button"
                 onClick={() => navigate(`/inspectors?oiaId=${params.data.id}`)}
                 title="Ver inspectores"
+                aria-label="Ver inspectores"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
               >
                 <Users className="h-4 w-4" />
-              </Button>
+              </button>
             )}
             {canUsers && (
-              <Button
-                variant="outline"
-                size="sm"
+              <button
+                type="button"
                 onClick={() => navigate(`/oias/${params.data.id}/users`)}
                 title="Ver usuarios"
+                aria-label="Ver usuarios"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
               >
                 <User className="h-4 w-4" />
-              </Button>
+              </button>
             )}
           </div>
         ),

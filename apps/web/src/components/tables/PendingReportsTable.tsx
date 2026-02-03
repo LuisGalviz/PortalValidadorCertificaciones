@@ -3,7 +3,6 @@ import { AgGridReact } from 'ag-grid-react';
 import { useMemo, useRef } from 'react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { Button } from '@/components/ui/button';
 import { api } from '@/lib/api';
 import { useQuery } from '@tanstack/react-query';
 import { ExternalLink } from 'lucide-react';
@@ -114,14 +113,15 @@ export function PendingReportsTable({ limit = 10 }: PendingReportsTableProps) {
         width: 100,
         cellClass: 'text-center',
         cellRenderer: (params: { data: PendingReport }) => (
-          <Button
-            variant="default"
-            size="sm"
-            className="bg-primary hover:bg-primary/90"
+          <button
+            type="button"
             onClick={() => navigate(`/reports/${params.data.id}`)}
+            title="Gestionar reporte"
+            aria-label="Gestionar reporte"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
           >
             <ExternalLink className="h-4 w-4" />
-          </Button>
+          </button>
         ),
       },
     ],

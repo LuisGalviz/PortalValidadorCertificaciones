@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { api } from '@/lib/api';
 import { ReportStatusText, StatusCode } from '@portal/shared';
 import { useQuery } from '@tanstack/react-query';
+import { Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface ReportListItem {
@@ -114,13 +115,15 @@ export function ReportsTable({ oiaId, status }: ReportsTableProps) {
         width: 120,
         sortable: false,
         cellRenderer: (params: { data: ReportListItem }) => (
-          <Button
-            variant="outline"
-            size="sm"
+          <button
+            type="button"
             onClick={() => navigate(`/reports/${params.data.id}`)}
+            title="Ver reporte"
+            aria-label="Ver reporte"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
           >
-            Ver
-          </Button>
+            <Eye className="h-4 w-4" />
+          </button>
         ),
       },
     ],
