@@ -1,6 +1,6 @@
-import type { ColDef, GridReadyEvent } from 'ag-grid-community';
+import type { ColDef } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
-import { useCallback, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { Badge } from '@/components/ui/badge';
@@ -51,7 +51,7 @@ export function OiaUsersTable({ oiaId, onView, onEdit, canEdit }: OiaUsersTableP
 
   const columnDefs = useMemo<ColDef[]>(
     () => [
-      { field: 'name', headerName: 'Nombre', width: 220, sortable: true, flex: 1 },
+      { field: 'name', headerName: 'Nombre', minWidth: 220, sortable: true, flex: 1 },
       {
         field: 'authEmail',
         headerName: 'Correo de acceso',
@@ -132,10 +132,6 @@ export function OiaUsersTable({ oiaId, onView, onEdit, canEdit }: OiaUsersTableP
     []
   );
 
-  const onGridReady = useCallback((params: GridReadyEvent) => {
-    params.api.sizeColumnsToFit();
-  }, []);
-
   return (
     <div className="space-y-4">
       <div className="ag-theme-alpine h-[420px] sm:h-[480px] md:h-[calc(100vh-360px)] lg:h-[calc(100vh-320px)] xl:h-[calc(100vh-280px)] 2xl:h-[calc(100vh-240px)] min-h-[350px] w-full">
@@ -144,7 +140,6 @@ export function OiaUsersTable({ oiaId, onView, onEdit, canEdit }: OiaUsersTableP
           rowData={data?.data || []}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
-          onGridReady={onGridReady}
           animateRows={true}
           loading={isLoading}
           suppressPaginationPanel={true}

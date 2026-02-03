@@ -1,4 +1,4 @@
-import type { ColDef, GridReadyEvent, SortChangedEvent } from 'ag-grid-community';
+import type { ColDef, SortChangedEvent } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -84,7 +84,7 @@ export function OiasTable({ search, status, canEdit, canInspectors, canUsers }: 
     () => [
       { field: 'id', headerName: 'ID', width: 80, sortable: true },
       { field: 'identification', headerName: 'NIT', width: 120, sortable: true },
-      { field: 'name', headerName: 'Razón Social', width: 220, sortable: true, flex: 1 },
+      { field: 'name', headerName: 'Razón Social', minWidth: 220, sortable: true, flex: 1 },
       { field: 'typeOrganismName', headerName: 'Tipo', width: 160 },
       {
         field: 'effectiveDate',
@@ -114,9 +114,10 @@ export function OiasTable({ search, status, canEdit, canInspectors, canUsers }: 
       },
       {
         field: 'acceptedTermsAndConditions',
-        headerName: 'Términos y condiciones',
-        width: 190,
-        valueFormatter: (params) => (params.value ? 'SI' : 'NO'),
+        headerName: 'TyC',
+        width: 100,
+        cellDataType: 'text',
+        cellRenderer: (params: { value: boolean | null }) => (params.value ? 'SI' : 'NO'),
       },
       {
         field: 'actions',
@@ -174,10 +175,6 @@ export function OiasTable({ search, status, canEdit, canInspectors, canUsers }: 
     []
   );
 
-  const onGridReady = useCallback((params: GridReadyEvent) => {
-    params.api.sizeColumnsToFit();
-  }, []);
-
   const onSortChanged = useCallback((event: SortChangedEvent) => {
     const sortState = event.api.getColumnState().find((col) => col.sort);
     if (sortState) {
@@ -200,7 +197,6 @@ export function OiasTable({ search, status, canEdit, canInspectors, canUsers }: 
           rowData={data?.data || []}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
-          onGridReady={onGridReady}
           onSortChanged={onSortChanged}
           animateRows={true}
           loading={isLoading}

@@ -56,54 +56,49 @@ export function PendingReportsTable({ limit = 10 }: PendingReportsTableProps) {
       {
         field: 'id',
         headerName: 'Reporte',
-        minWidth: 90,
-        flex: 1,
+        width: 90,
         cellClass: 'text-center',
       },
       {
         field: 'orderId',
         headerName: 'Orden',
-        minWidth: 100,
-        flex: 1,
+        width: 100,
         cellClass: 'text-center',
         valueFormatter: (p: ValueFormatterParams) => p.value || '-',
       },
       {
         field: 'orderExternal',
         headerName: 'Cio',
-        minWidth: 120,
-        flex: 1,
+        width: 120,
         cellClass: 'text-center',
         valueFormatter: (p: ValueFormatterParams) => p.value || '-',
       },
       {
         field: 'subscriptionId',
         headerName: 'Contrato',
-        minWidth: 100,
-        flex: 1,
+        width: 100,
         cellClass: 'text-center',
         valueFormatter: (p: ValueFormatterParams) => p.value || '-',
       },
       {
         field: 'inspectionType',
         headerName: 'Tipo inspección',
-        minWidth: 150,
+        minWidth: 170,
         flex: 2,
         valueFormatter: (p: ValueFormatterParams) => p.value || '-',
       },
       {
         field: 'oiaName',
         headerName: 'OIA',
-        minWidth: 150,
-        flex: 2,
+        minWidth: 160,
+        flex: 1.5,
         cellClass: 'text-center',
         valueFormatter: (p: ValueFormatterParams) => p.value || '-',
       },
       {
         field: 'createdAt',
         headerName: 'Fecha de creación',
-        minWidth: 140,
-        flex: 1.5,
+        width: 150,
         cellClass: 'text-center',
         valueFormatter: (p: ValueFormatterParams) => formatDate(p.value),
       },
@@ -147,7 +142,6 @@ export function PendingReportsTable({ limit = 10 }: PendingReportsTableProps) {
         animateRows={true}
         loading={isLoading}
         domLayout="autoHeight"
-        onGridReady={(params) => params.api.sizeColumnsToFit()}
       />
     </div>
   );

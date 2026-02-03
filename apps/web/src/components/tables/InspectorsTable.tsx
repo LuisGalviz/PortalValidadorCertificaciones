@@ -1,4 +1,4 @@
-import type { ColDef, GridReadyEvent, SortChangedEvent } from 'ag-grid-community';
+import type { ColDef, SortChangedEvent } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -83,7 +83,7 @@ export function InspectorsTable({ search, status, oiaId }: InspectorsTableProps)
     () => [
       { field: 'id', headerName: 'ID', width: 80, sortable: true },
       { field: 'identification', headerName: 'Identificación', width: 130, sortable: true },
-      { field: 'name', headerName: 'Nombre', width: 200, sortable: true, flex: 1 },
+      { field: 'name', headerName: 'Nombre', minWidth: 200, sortable: true, flex: 1 },
       { field: 'codeCertificate', headerName: 'Código Certificado', width: 150 },
       { field: 'oiaName', headerName: 'OIA', width: 150 },
       {
@@ -129,10 +129,6 @@ export function InspectorsTable({ search, status, oiaId }: InspectorsTableProps)
     []
   );
 
-  const onGridReady = useCallback((params: GridReadyEvent) => {
-    params.api.sizeColumnsToFit();
-  }, []);
-
   const onSortChanged = useCallback((event: SortChangedEvent) => {
     const sortState = event.api.getColumnState().find((col) => col.sort);
     if (sortState) {
@@ -155,7 +151,6 @@ export function InspectorsTable({ search, status, oiaId }: InspectorsTableProps)
           rowData={data?.data || []}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
-          onGridReady={onGridReady}
           onSortChanged={onSortChanged}
           animateRows={true}
           loading={isLoading}

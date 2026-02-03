@@ -1,4 +1,4 @@
-import type { ColDef, GridReadyEvent, SortChangedEvent } from 'ag-grid-community';
+import type { ColDef, SortChangedEvent } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -108,7 +108,7 @@ export function ReportsTable({ oiaId, status }: ReportsTableProps) {
       },
       { field: 'oiaName', headerName: 'OIA', width: 150 },
       { field: 'inspectorName', headerName: 'Inspector', width: 150 },
-      { field: 'address', headerName: 'Dirección', width: 200, flex: 1 },
+      { field: 'address', headerName: 'Dirección', minWidth: 200, flex: 1 },
       {
         field: 'actions',
         headerName: 'Acciones',
@@ -139,10 +139,6 @@ export function ReportsTable({ oiaId, status }: ReportsTableProps) {
     []
   );
 
-  const onGridReady = useCallback((params: GridReadyEvent) => {
-    params.api.sizeColumnsToFit();
-  }, []);
-
   const onSortChanged = useCallback((event: SortChangedEvent) => {
     const sortState = event.api.getColumnState().find((col) => col.sort);
     if (sortState) {
@@ -165,7 +161,6 @@ export function ReportsTable({ oiaId, status }: ReportsTableProps) {
           rowData={data?.data || []}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
-          onGridReady={onGridReady}
           onSortChanged={onSortChanged}
           animateRows={true}
           loading={isLoading}

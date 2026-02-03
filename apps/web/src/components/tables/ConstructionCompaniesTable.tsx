@@ -1,4 +1,4 @@
-import type { ColDef, GridReadyEvent, SortChangedEvent } from 'ag-grid-community';
+import type { ColDef, SortChangedEvent } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -46,7 +46,7 @@ export function ConstructionCompaniesTable({ search }: ConstructionCompaniesTabl
     () => [
       { field: 'id', headerName: 'ID', width: 80, sortable: true },
       { field: 'nit', headerName: 'NIT', width: 120, sortable: true },
-      { field: 'name', headerName: 'Nombre', width: 200, sortable: true, flex: 1 },
+      { field: 'name', headerName: 'Nombre', minWidth: 200, sortable: true, flex: 1 },
       { field: 'rufiCode', headerName: 'Código RUFI', width: 120 },
       { field: 'category', headerName: 'Categoría', width: 120 },
       { field: 'contractStatus', headerName: 'Estado Contrato', width: 140 },
@@ -81,10 +81,6 @@ export function ConstructionCompaniesTable({ search }: ConstructionCompaniesTabl
     []
   );
 
-  const onGridReady = useCallback((params: GridReadyEvent) => {
-    params.api.sizeColumnsToFit();
-  }, []);
-
   const onSortChanged = useCallback((event: SortChangedEvent) => {
     const sortState = event.api.getColumnState().find((col) => col.sort);
     if (sortState) {
@@ -107,7 +103,6 @@ export function ConstructionCompaniesTable({ search }: ConstructionCompaniesTabl
           rowData={data?.data || []}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
-          onGridReady={onGridReady}
           onSortChanged={onSortChanged}
           animateRows={true}
           loading={isLoading}
