@@ -18,7 +18,7 @@ interface OiaAttributes {
   emailContact?: string | null;
   userId?: number | null;
   codeOrganism?: number | null;
-  organismCodes?: Record<string, unknown> | null;
+  organismCodes?: Record<string, unknown> | Record<string, unknown>[] | null;
   acceptedTermsAndConditions?: boolean | null;
   status: number;
   comment?: string | null;
@@ -46,7 +46,7 @@ export class Oia extends Model<OiaAttributes, OiaCreationAttributes> implements 
   declare emailContact: string | null;
   declare userId: number | null;
   declare codeOrganism: number | null;
-  declare organismCodes: Record<string, unknown> | null;
+  declare organismCodes: Record<string, unknown> | Record<string, unknown>[] | null;
   declare acceptedTermsAndConditions: boolean | null;
   declare status: number;
   declare comment: string | null;

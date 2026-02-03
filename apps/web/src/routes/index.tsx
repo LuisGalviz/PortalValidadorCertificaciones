@@ -5,6 +5,7 @@ import { ConstructionCompaniesListPage } from '@/pages/construction-companies/Co
 import { DashboardPage } from '@/pages/dashboard/DashboardPage';
 import { InspectorsListPage } from '@/pages/inspectors/InspectorsListPage';
 import { MyOiaPage } from '@/pages/oias/MyOiaPage';
+import { OiaCreatePage } from '@/pages/oias/OiaCreatePage';
 import { OiasListPage } from '@/pages/oias/OiasListPage';
 import { ReportDetailPage } from '@/pages/reports/ReportDetailPage';
 import { ReportsListPage } from '@/pages/reports/ReportsListPage';
@@ -40,6 +41,14 @@ export const router = createBrowserRouter(
         {
           path: 'reports/:id',
           element: <ReportDetailPage />,
+        },
+        {
+          path: 'oias/new',
+          element: (
+            <ProtectedRoute requiredPermission={Permissions.OIAS_CREATE}>
+              <OiaCreatePage />
+            </ProtectedRoute>
+          ),
         },
         {
           path: 'oias',

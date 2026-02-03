@@ -81,12 +81,25 @@ export function OiasTable({ search, status }: OiasTableProps) {
     () => [
       { field: 'id', headerName: 'ID', width: 80, sortable: true },
       { field: 'identification', headerName: 'NIT', width: 120, sortable: true },
-      { field: 'name', headerName: 'Nombre', width: 200, sortable: true, flex: 1 },
-      { field: 'codeAcred', headerName: 'Código Acreditación', width: 160 },
+      { field: 'name', headerName: 'Razón Social', width: 220, sortable: true, flex: 1 },
+      { field: 'typeOrganismName', headerName: 'Tipo', width: 160 },
       {
         field: 'effectiveDate',
-        headerName: 'Fecha Vigencia',
+        headerName: 'Vigencia ONAC',
         width: 140,
+        valueFormatter: (params) =>
+          params.value ? new Date(params.value).toLocaleDateString('es-CO') : '-',
+      },
+      {
+        field: 'nameContact',
+        headerName: 'Contacto',
+        width: 180,
+        valueFormatter: (params) => (params.value ? String(params.value) : '-'),
+      },
+      {
+        field: 'createdAt',
+        headerName: 'Fecha de Registro',
+        width: 150,
         valueFormatter: (params) =>
           params.value ? new Date(params.value).toLocaleDateString('es-CO') : '-',
       },
@@ -95,6 +108,12 @@ export function OiasTable({ search, status }: OiasTableProps) {
         headerName: 'Estado',
         width: 130,
         cellRenderer: StatusCellRenderer,
+      },
+      {
+        field: 'acceptedTermsAndConditions',
+        headerName: 'Términos y condiciones',
+        width: 190,
+        valueFormatter: (params) => (params.value ? 'SI' : 'NO'),
       },
       {
         field: 'actions',

@@ -1,18 +1,129 @@
-import { OiaStatusCode } from '@portal/shared';
-import type { Response } from 'express';
+import { OiaStatusCode, Profile } from '@portal/shared';
+import type { NextFunction, Response } from 'express';
+import { Op } from 'sequelize';
+import { sequelize } from '../config/database.js';
 import type { AuthenticatedRequest } from '../middleware/auth.js';
-import { User } from '../models/index.js';
-import { oiaService } from '../services/OiaService.js';
+import { handleControllerError } from '../middleware/handleControllerError.js';
+import { Oia, OiaUsers, Permission, User } from '../models/index.js';
+import { OiaFileSaveError, OiaFileUploadError, oiaService } from '../services/OiaService.js';
 import {
   createOiaSchema,
   idParamSchema,
   oiaFilterSchema,
+  registerOiaSchema,
   updateOiaSchema,
   updateOwnOiaSchema,
 } from '../validators/index.js';
 
+type MulterFile = {
+  buffer: Buffer;
+  originalname: string;
+  mimetype: string;
+};
+
+type OrganismCode = {
+  gasera: string;
+  codigo: string;
+};
+
+function isRegisterRequest(body?: Record<string, unknown>): boolean {
+  if (!body) return false;
+  return Boolean(body.userName || body.userEmail || body.userPhone);
+}
+
+async function respondIfOiaExists(identification: number, res: Response): Promise<boolean> {
+  const existing = await oiaService.findByIdentification(identification);
+  if (!existing) return false;
+
+  res.status(409).json({ success: false, error: 'OIA with this identification already exists' });
+  return true;
+}
+
+async function respondIfUserExists(email: string, res: Response): Promise<boolean> {
+  const existingUser = await User.findOne({
+    where: {
+      [Op.or]: [{ authEmail: email }, { email }],
+    },
+  });
+
+  if (!existingUser) return false;
+
+  res.status(409).json({
+    success: false,
+    error: 'Ya existe un usuario con el correo indicado',
+  });
+  return true;
+}
+
+function getRegisterFiles(
+  req: AuthenticatedRequest & { files?: Record<string, MulterFile[]> },
+  res: Response
+): { fileOnac: MulterFile; fileCRT: MulterFile } | null {
+  const fileOnac = req.files?.fileOnac?.[0];
+  const fileCRT = req.files?.fileCRT?.[0] || req.files?.fileExistenceCertificate?.[0];
+
+  if (!fileOnac || !fileCRT) {
+    res.status(400).json({
+      success: false,
+      error: 'Debe cargar los certificados ONAC y de existencia',
+    });
+    return null;
+  }
+
+  return { fileOnac, fileCRT };
+}
+
+function getOrganismCodes(raw: unknown, res: Response): OrganismCode[] | undefined | null {
+  try {
+    return parseOrganismCodes(raw);
+  } catch (parseError) {
+    res.status(400).json({
+      success: false,
+      error: parseError instanceof Error ? parseError.message : 'Datos inválidos',
+    });
+    return null;
+  }
+}
+
+function parseOrganismCodes(raw: unknown): OrganismCode[] | undefined {
+  if (raw === undefined || raw === null || raw === '') {
+    return undefined;
+  }
+
+  let parsed = raw;
+  if (typeof raw === 'string') {
+    const trimmed = raw.trim();
+    if (!trimmed) return undefined;
+    try {
+      parsed = JSON.parse(trimmed);
+    } catch {
+      throw new Error('Formato inválido para los códigos de organismo');
+    }
+  }
+
+  if (!Array.isArray(parsed)) {
+    throw new Error('Formato inválido para los códigos de organismo');
+  }
+
+  const normalized = parsed.map((item) => ({
+    gasera: String(item?.gasera ?? '').trim(),
+    codigo: String(item?.codigo ?? '').trim(),
+  }));
+
+  if (normalized.some((item) => !item.gasera || !item.codigo)) {
+    throw new Error('Formato inválido para los códigos de organismo');
+  }
+
+  const gaseras = normalized.map((item) => item.gasera);
+  if (new Set(gaseras).size !== gaseras.length) {
+    throw new Error('No puede haber gaseras repetidas');
+  }
+
+  return normalized;
+}
+
 export class OiaController {
-  async findAll(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async findAll(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const filters = oiaFilterSchema.parse(req.query);
       const result = await oiaService.findAll(filters);
@@ -22,15 +133,13 @@ export class OiaController {
         ...result,
       });
     } catch (error) {
-      if (error instanceof Error && error.name === 'ZodError') {
-        res.status(400).json({ success: false, error: 'Invalid query parameters' });
-        return;
-      }
-      res.status(500).json({ success: false, error: 'Error fetching OIAs' });
+      handleControllerError(error, next, 'Error fetching OIAs', {
+        zodMessage: 'Invalid query parameters',
+      });
     }
   }
 
-  async findById(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async findById(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = idParamSchema.parse(req.params);
       const oia = await oiaService.findById(id);
@@ -45,43 +154,171 @@ export class OiaController {
         data: oia,
       });
     } catch (error) {
-      if (error instanceof Error && error.name === 'ZodError') {
-        res.status(400).json({ success: false, error: 'Invalid OIA ID' });
-        return;
-      }
-      res.status(500).json({ success: false, error: 'Error fetching OIA' });
+      handleControllerError(error, next, 'Error fetching OIA', {
+        zodMessage: 'Invalid OIA ID',
+      });
     }
   }
 
-  async create(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async create(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const data = createOiaSchema.parse(req.body);
-
-      // Check if OIA with same identification exists
-      const existing = await oiaService.findByIdentification(data.identification);
-      if (existing) {
-        res
-          .status(409)
-          .json({ success: false, error: 'OIA with this identification already exists' });
+      if (isRegisterRequest(req.body)) {
+        await this.createWithRegistration(req, res);
         return;
       }
 
-      const oia = await oiaService.create(data);
+      await this.createSimple(req, res);
+    } catch (error) {
+      if (error instanceof OiaFileUploadError || error instanceof OiaFileSaveError) {
+        handleControllerError(error, next, error.message, { statusCode: 500 });
+        return;
+      }
+      handleControllerError(error, next, 'Error creating OIA', {
+        zodMessage: 'Invalid OIA data',
+      });
+    }
+  }
+
+  private async createSimple(req: AuthenticatedRequest, res: Response): Promise<void> {
+    const data = createOiaSchema.parse(req.body);
+
+    if (await respondIfOiaExists(data.identification, res)) {
+      return;
+    }
+
+    const oia = await oiaService.create(data);
+
+    res.status(201).json({
+      success: true,
+      data: oia,
+    });
+  }
+
+  private async createWithRegistration(req: AuthenticatedRequest, res: Response): Promise<void> {
+    const transaction = await sequelize.transaction();
+    const files = getRegisterFiles(
+      req as AuthenticatedRequest & { files?: Record<string, MulterFile[]> },
+      res
+    );
+    if (!files) {
+      await transaction.rollback();
+      return;
+    }
+
+    const parsedOrganismCodes = getOrganismCodes(req.body?.organismCodes, res);
+    if (parsedOrganismCodes === null) {
+      await transaction.rollback();
+      return;
+    }
+
+    try {
+      const data = registerOiaSchema.parse({
+        ...req.body,
+        organismCodes: parsedOrganismCodes,
+      });
+
+      if (await respondIfOiaExists(data.identification, res)) {
+        await transaction.rollback();
+        return;
+      }
+
+      if (await respondIfUserExists(data.userEmail, res)) {
+        await transaction.rollback();
+        return;
+      }
+
+      const status = OiaStatusCode.Approved;
+      const active = true;
+
+      const user = await User.create(
+        {
+          name: data.userName,
+          phone: data.userPhone,
+          email: data.userEmail,
+          authEmail: data.userEmail,
+          active,
+        },
+        { transaction }
+      );
+
+      await Permission.create(
+        {
+          userId: user.id,
+          permission: Profile.Oia as unknown as number,
+        },
+        { transaction }
+      );
+
+      const oia = await Oia.create(
+        {
+          identification: data.identification,
+          name: data.name,
+          codeAcred: data.codeAcred,
+          effectiveDate: data.effectiveDate ? new Date(data.effectiveDate) : undefined,
+          cedRepLegal: data.cedRepLegal,
+          nameRepLegal: data.nameRepLegal,
+          addressRepLegal: data.addressRepLegal,
+          typeOrganismId: data.typeOrganismId,
+          addressOrganism: data.addressOrganism,
+          nameContact: data.nameContact,
+          phoneContact: data.phoneContact,
+          phoneContactAlternative: data.phoneContactAlternative,
+          emailContact: data.emailContact || data.userEmail,
+          codeOrganism: data.codeOrganism,
+          organismCodes: data.organismCodes ?? null,
+          acceptedTermsAndConditions: data.acceptedTermsAndConditions ?? false,
+          userId: user.id,
+          status,
+          active,
+        },
+        { transaction }
+      );
+
+      await OiaUsers.create(
+        {
+          oiaId: oia.id,
+          userId: user.id,
+          createdAt: new Date(),
+        },
+        { transaction }
+      );
+
+      await oiaService.saveFile(
+        oia.id,
+        {
+          data: files.fileOnac.buffer,
+          name: files.fileOnac.originalname,
+          mimetype: files.fileOnac.mimetype,
+        },
+        'ONAC',
+        transaction
+      );
+
+      await oiaService.saveFile(
+        oia.id,
+        {
+          data: files.fileCRT.buffer,
+          name: files.fileCRT.originalname,
+          mimetype: files.fileCRT.mimetype,
+        },
+        'CRT',
+        transaction
+      );
+
+      await transaction.commit();
 
       res.status(201).json({
         success: true,
         data: oia,
+        message: 'OIA registrado correctamente',
       });
     } catch (error) {
-      if (error instanceof Error && error.name === 'ZodError') {
-        res.status(400).json({ success: false, error: 'Invalid OIA data' });
-        return;
-      }
-      res.status(500).json({ success: false, error: 'Error creating OIA' });
+      await transaction.rollback();
+      throw error;
     }
   }
 
-  async update(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async update(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = idParamSchema.parse(req.params);
       const data = updateOiaSchema.parse(req.body);
@@ -98,15 +335,13 @@ export class OiaController {
         data: oia,
       });
     } catch (error) {
-      if (error instanceof Error && error.name === 'ZodError') {
-        res.status(400).json({ success: false, error: 'Invalid OIA data' });
-        return;
-      }
-      res.status(500).json({ success: false, error: 'Error updating OIA' });
+      handleControllerError(error, next, 'Error updating OIA', {
+        zodMessage: 'Invalid OIA data',
+      });
     }
   }
 
-  async getUsers(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async getUsers(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = idParamSchema.parse(req.params);
       const users = await oiaService.getUsers(id);
@@ -116,15 +351,13 @@ export class OiaController {
         data: users,
       });
     } catch (error) {
-      if (error instanceof Error && error.name === 'ZodError') {
-        res.status(400).json({ success: false, error: 'Invalid OIA ID' });
-        return;
-      }
-      res.status(500).json({ success: false, error: 'Error fetching OIA users' });
+      handleControllerError(error, next, 'Error fetching OIA users', {
+        zodMessage: 'Invalid OIA ID',
+      });
     }
   }
 
-  async findOwn(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async findOwn(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const oiaId = req.user?.oiaId;
 
@@ -145,12 +378,11 @@ export class OiaController {
         data: oia,
       });
     } catch (error) {
-      console.error('Error fetching OIA data:', error);
-      res.status(500).json({ success: false, error: 'Error fetching OIA data' });
+      handleControllerError(error, next, 'Error fetching OIA data');
     }
   }
 
-  async updateOwn(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async updateOwn(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const oiaId = req.user?.oiaId;
       const userId = req.user?.id;
@@ -226,12 +458,9 @@ export class OiaController {
         message: 'Datos actualizados. Su solicitud está pendiente de revisión.',
       });
     } catch (err) {
-      console.error('Error updating OIA data:', err);
-      if (err instanceof Error && err.name === 'ZodError') {
-        res.status(400).json({ success: false, error: 'Invalid OIA data' });
-        return;
-      }
-      res.status(500).json({ success: false, error: 'Error updating OIA data' });
+      handleControllerError(err, next, 'Error updating OIA data', {
+        zodMessage: 'Invalid OIA data',
+      });
     }
   }
 }

@@ -9,17 +9,17 @@ import {
 
 const router = Router();
 
-router.get('/', ensureAuthenticated, canReadInspectors, (req, res) =>
-  inspectorController.findAll(req, res)
+router.get('/', ensureAuthenticated, canReadInspectors, (req, res, next) =>
+  inspectorController.findAll(req, res, next)
 );
-router.get('/:id', ensureAuthenticated, canReadInspectors, (req, res) =>
-  inspectorController.findById(req, res)
+router.get('/:id', ensureAuthenticated, canReadInspectors, (req, res, next) =>
+  inspectorController.findById(req, res, next)
 );
-router.post('/', ensureAuthenticated, canCreateInspectors, (req, res) =>
-  inspectorController.create(req, res)
+router.post('/', ensureAuthenticated, canCreateInspectors, (req, res, next) =>
+  inspectorController.create(req, res, next)
 );
-router.put('/:id', ensureAuthenticated, canUpdateInspectors, (req, res) =>
-  inspectorController.update(req, res)
+router.put('/:id', ensureAuthenticated, canUpdateInspectors, (req, res, next) =>
+  inspectorController.update(req, res, next)
 );
 
 export default router;

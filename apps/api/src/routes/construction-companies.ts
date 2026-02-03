@@ -4,17 +4,17 @@ import { canCreateCompanies, canReadCompanies, ensureAuthenticated } from '../mi
 
 const router = Router();
 
-router.get('/', ensureAuthenticated, canReadCompanies, (req, res) =>
-  constructionCompanyController.findAll(req, res)
+router.get('/', ensureAuthenticated, canReadCompanies, (req, res, next) =>
+  constructionCompanyController.findAll(req, res, next)
 );
-router.get('/active', ensureAuthenticated, canReadCompanies, (req, res) =>
-  constructionCompanyController.getActive(req, res)
+router.get('/active', ensureAuthenticated, canReadCompanies, (req, res, next) =>
+  constructionCompanyController.getActive(req, res, next)
 );
-router.get('/:id', ensureAuthenticated, canReadCompanies, (req, res) =>
-  constructionCompanyController.findById(req, res)
+router.get('/:id', ensureAuthenticated, canReadCompanies, (req, res, next) =>
+  constructionCompanyController.findById(req, res, next)
 );
-router.post('/', ensureAuthenticated, canCreateCompanies, (req, res) =>
-  constructionCompanyController.create(req, res)
+router.post('/', ensureAuthenticated, canCreateCompanies, (req, res, next) =>
+  constructionCompanyController.create(req, res, next)
 );
 
 export default router;

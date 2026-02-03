@@ -1,5 +1,6 @@
-import type { Response } from 'express';
+import type { NextFunction, Response } from 'express';
 import type { AuthenticatedRequest } from '../middleware/auth.js';
+import { handleControllerError } from '../middleware/handleControllerError.js';
 import { constructionCompanyService } from '../services/ConstructionCompanyService.js';
 import {
   constructionCompanyFilterSchema,
@@ -8,7 +9,7 @@ import {
 } from '../validators/index.js';
 
 export class ConstructionCompanyController {
-  async findAll(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async findAll(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const filters = constructionCompanyFilterSchema.parse(req.query);
       const result = await constructionCompanyService.findAll(filters);
@@ -18,15 +19,13 @@ export class ConstructionCompanyController {
         ...result,
       });
     } catch (error) {
-      if (error instanceof Error && error.name === 'ZodError') {
-        res.status(400).json({ success: false, error: 'Invalid query parameters' });
-        return;
-      }
-      res.status(500).json({ success: false, error: 'Error fetching construction companies' });
+      handleControllerError(error, next, 'Error fetching construction companies', {
+        zodMessage: 'Invalid query parameters',
+      });
     }
   }
 
-  async findById(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async findById(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = idParamSchema.parse(req.params);
       const company = await constructionCompanyService.findById(id);
@@ -41,15 +40,13 @@ export class ConstructionCompanyController {
         data: company,
       });
     } catch (error) {
-      if (error instanceof Error && error.name === 'ZodError') {
-        res.status(400).json({ success: false, error: 'Invalid ID' });
-        return;
-      }
-      res.status(500).json({ success: false, error: 'Error fetching construction company' });
+      handleControllerError(error, next, 'Error fetching construction company', {
+        zodMessage: 'Invalid ID',
+      });
     }
   }
 
-  async create(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async create(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const data = createConstructionCompanySchema.parse(req.body);
 
@@ -70,15 +67,13 @@ export class ConstructionCompanyController {
         data: company,
       });
     } catch (error) {
-      if (error instanceof Error && error.name === 'ZodError') {
-        res.status(400).json({ success: false, error: 'Invalid construction company data' });
-        return;
-      }
-      res.status(500).json({ success: false, error: 'Error creating construction company' });
+      handleControllerError(error, next, 'Error creating construction company', {
+        zodMessage: 'Invalid construction company data',
+      });
     }
   }
 
-  async getActive(_req: AuthenticatedRequest, res: Response): Promise<void> {
+  async getActive(_req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const companies = await constructionCompanyService.getActiveCompanies();
 
@@ -87,9 +82,7 @@ export class ConstructionCompanyController {
         data: companies,
       });
     } catch (error) {
-      res
-        .status(500)
-        .json({ success: false, error: 'Error fetching active construction companies' });
+      handleControllerError(error, next, 'Error fetching active construction companies');
     }
   }
 }

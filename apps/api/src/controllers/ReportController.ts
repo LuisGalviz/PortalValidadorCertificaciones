@@ -1,6 +1,7 @@
 import { Profile } from '@portal/shared';
-import type { Response } from 'express';
+import type { NextFunction, Response } from 'express';
 import type { AuthenticatedRequest } from '../middleware/auth.js';
+import { handleControllerError } from '../middleware/handleControllerError.js';
 import { reportService } from '../services/ReportService.js';
 import {
   createReportSchema,
@@ -10,7 +11,7 @@ import {
 } from '../validators/index.js';
 
 export class ReportController {
-  async findAll(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async findAll(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const filters = reportFilterSchema.parse(req.query);
 
@@ -26,15 +27,13 @@ export class ReportController {
         ...result,
       });
     } catch (error) {
-      if (error instanceof Error && error.name === 'ZodError') {
-        res.status(400).json({ success: false, error: 'Invalid query parameters' });
-        return;
-      }
-      res.status(500).json({ success: false, error: 'Error fetching reports' });
+      handleControllerError(error, next, 'Error fetching reports', {
+        zodMessage: 'Invalid query parameters',
+      });
     }
   }
 
-  async findById(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async findById(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = idParamSchema.parse(req.params);
 
@@ -56,15 +55,13 @@ export class ReportController {
         data: report,
       });
     } catch (error) {
-      if (error instanceof Error && error.name === 'ZodError') {
-        res.status(400).json({ success: false, error: 'Invalid report ID' });
-        return;
-      }
-      res.status(500).json({ success: false, error: 'Error fetching report' });
+      handleControllerError(error, next, 'Error fetching report', {
+        zodMessage: 'Invalid report ID',
+      });
     }
   }
 
-  async create(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async create(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const data = createReportSchema.parse(req.body);
 
@@ -84,15 +81,13 @@ export class ReportController {
         data: report,
       });
     } catch (error) {
-      if (error instanceof Error && error.name === 'ZodError') {
-        res.status(400).json({ success: false, error: 'Invalid report data' });
-        return;
-      }
-      res.status(500).json({ success: false, error: 'Error creating report' });
+      handleControllerError(error, next, 'Error creating report', {
+        zodMessage: 'Invalid report data',
+      });
     }
   }
 
-  async review(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async review(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = idParamSchema.parse(req.params);
       const data = reviewReportSchema.parse(req.body);
@@ -114,15 +109,17 @@ export class ReportController {
         data: report,
       });
     } catch (error) {
-      if (error instanceof Error && error.name === 'ZodError') {
-        res.status(400).json({ success: false, error: 'Invalid review data' });
-        return;
-      }
-      res.status(500).json({ success: false, error: 'Error reviewing report' });
+      handleControllerError(error, next, 'Error reviewing report', {
+        zodMessage: 'Invalid review data',
+      });
     }
   }
 
-  async getIndependent(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async getIndependent(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       const filters = reportFilterSchema.parse(req.query);
 
@@ -137,7 +134,7 @@ export class ReportController {
         ...result,
       });
     } catch (error) {
-      res.status(500).json({ success: false, error: 'Error fetching independent reports' });
+      handleControllerError(error, next, 'Error fetching independent reports');
     }
   }
 }

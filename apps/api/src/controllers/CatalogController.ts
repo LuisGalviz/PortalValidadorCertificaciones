@@ -1,11 +1,16 @@
-import type { Response } from 'express';
+import type { NextFunction, Response } from 'express';
 import type { AuthenticatedRequest } from '../middleware/auth.js';
+import { handleControllerError } from '../middleware/handleControllerError.js';
 import { TypeOrganism } from '../models/index.js';
 import { catalogService } from '../services/CatalogService.js';
 import { checkListService } from '../services/CheckListService.js';
 
 export class CatalogController {
-  async getTypeOrganisms(_req: AuthenticatedRequest, res: Response): Promise<void> {
+  async getTypeOrganisms(
+    _req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       const types = await TypeOrganism.findAll({
         where: { active: true },
@@ -17,11 +22,15 @@ export class CatalogController {
         data: types,
       });
     } catch (error) {
-      res.status(500).json({ success: false, error: 'Error fetching organism types' });
+      handleControllerError(error, next, 'Error fetching organism types');
     }
   }
 
-  async getInspectionTypes(_req: AuthenticatedRequest, res: Response): Promise<void> {
+  async getInspectionTypes(
+    _req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       const types = await catalogService.getInspectionTypes();
 
@@ -30,11 +39,11 @@ export class CatalogController {
         data: types,
       });
     } catch (error) {
-      res.status(500).json({ success: false, error: 'Error fetching inspection types' });
+      handleControllerError(error, next, 'Error fetching inspection types');
     }
   }
 
-  async getCausals(_req: AuthenticatedRequest, res: Response): Promise<void> {
+  async getCausals(_req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const causals = await catalogService.getCausals();
 
@@ -43,11 +52,11 @@ export class CatalogController {
         data: causals,
       });
     } catch (error) {
-      res.status(500).json({ success: false, error: 'Error fetching causals' });
+      handleControllerError(error, next, 'Error fetching causals');
     }
   }
 
-  async getCheckList(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async getCheckList(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const inspectionTypeParam = req.params.inspectionType;
       const inspectionType = Number.parseInt(
@@ -66,7 +75,7 @@ export class CatalogController {
         data: checkList,
       });
     } catch (error) {
-      res.status(500).json({ success: false, error: 'Error fetching checklist' });
+      handleControllerError(error, next, 'Error fetching checklist');
     }
   }
 }

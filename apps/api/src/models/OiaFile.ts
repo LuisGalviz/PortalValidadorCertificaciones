@@ -57,7 +57,7 @@ OiaFile.init(
     },
     type: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     path: {
       type: DataTypes.STRING,
@@ -65,13 +65,13 @@ OiaFile.init(
     },
     fileTypeCode: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
   },
   {
     sequelize,
     modelName: 'oiaFile',
-    tableName: 'oiaFile',
+    tableName: 'oia_files',
     freezeTableName: true,
   }
 );

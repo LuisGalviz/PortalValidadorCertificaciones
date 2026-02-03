@@ -13,8 +13,8 @@ import {
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-router.get('/me', ensureAuthenticated, canReadOwnOia, (req, res) =>
-  oiaController.findOwn(req, res)
+router.get('/me', ensureAuthenticated, canReadOwnOia, (req, res, next) =>
+  oiaController.findOwn(req, res, next)
 );
 router.put(
   '/me',
@@ -24,19 +24,31 @@ router.put(
     { name: 'fileOnac', maxCount: 1 },
     { name: 'fileCRT', maxCount: 1 },
   ]),
-  (req, res) => oiaController.updateOwn(req, res)
+  (req, res, next) => oiaController.updateOwn(req, res, next)
 );
 
-router.get('/', ensureAuthenticated, canReadOias, (req, res) => oiaController.findAll(req, res));
-router.get('/:id', ensureAuthenticated, canReadOias, (req, res) =>
-  oiaController.findById(req, res)
+router.get('/', ensureAuthenticated, canReadOias, (req, res, next) =>
+  oiaController.findAll(req, res, next)
 );
-router.post('/', ensureAuthenticated, canCreateOias, (req, res) => oiaController.create(req, res));
-router.put('/:id', ensureAuthenticated, canUpdateOias, (req, res) =>
-  oiaController.update(req, res)
+router.get('/:id', ensureAuthenticated, canReadOias, (req, res, next) =>
+  oiaController.findById(req, res, next)
 );
-router.get('/:id/users', ensureAuthenticated, canReadOias, (req, res) =>
-  oiaController.getUsers(req, res)
+router.post(
+  '/',
+  ensureAuthenticated,
+  canCreateOias,
+  upload.fields([
+    { name: 'fileOnac', maxCount: 1 },
+    { name: 'fileCRT', maxCount: 1 },
+    { name: 'fileExistenceCertificate', maxCount: 1 },
+  ]),
+  (req, res, next) => oiaController.create(req, res, next)
+);
+router.put('/:id', ensureAuthenticated, canUpdateOias, (req, res, next) =>
+  oiaController.update(req, res, next)
+);
+router.get('/:id/users', ensureAuthenticated, canReadOias, (req, res, next) =>
+  oiaController.getUsers(req, res, next)
 );
 
 export default router;

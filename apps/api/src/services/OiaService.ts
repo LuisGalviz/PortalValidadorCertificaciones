@@ -1,5 +1,5 @@
 import { OiaStatusCode, StatusRequestText } from '@portal/shared';
-import { Op } from 'sequelize';
+import { Op, type Transaction } from 'sequelize';
 import { OiaFileTypeCode, type OiaFileTypeCodeType } from '../models/OiaFile.js';
 import {
   Inspector,
@@ -53,6 +53,7 @@ export class OiaService {
 
     const { count, rows } = await Oia.findAndCountAll({
       where,
+      include: [{ model: TypeOrganism, as: 'typeOrganism', attributes: ['name'] }],
       order: [[sortBy || 'createdAt', sortOrder]],
       limit,
       offset,
@@ -64,6 +65,11 @@ export class OiaService {
       name: oia.name,
       codeAcred: oia.codeAcred,
       effectiveDate: oia.effectiveDate,
+      typeOrganismName:
+        (oia as unknown as { typeOrganism?: { name?: string | null } }).typeOrganism?.name ?? null,
+      nameContact: oia.nameContact,
+      createdAt: oia.createdAt,
+      acceptedTermsAndConditions: oia.acceptedTermsAndConditions,
       status: oia.status,
       statusName: getStatusName(oia.status),
       active: oia.active,
@@ -229,9 +235,10 @@ export class OiaService {
   async saveFile(
     oiaId: number,
     file: { data: Buffer; name: string; mimetype: string },
-    typeCode: OiaFileTypeCodeType
+    typeCode: OiaFileTypeCodeType,
+    transaction?: Transaction
   ) {
-    const oia = await Oia.findByPk(oiaId);
+    const oia = await Oia.findByPk(oiaId, { transaction });
     if (!oia) throw new Error('OIA not found');
 
     // Count existing files of same type to increment suffix
@@ -240,6 +247,7 @@ export class OiaService {
         oiaId,
         fileTypeCode: typeCode,
       },
+      transaction,
     });
 
     const suffix = count + 1;
@@ -248,17 +256,42 @@ export class OiaService {
     const s3Key = `CertificadosOIA/${oia.identification}/${oia.identification}_${typeLabel}_${suffix}.pdf`;
 
     // Upload to S3
-    await s3Service.uploadFile(s3Key, file.data, file.mimetype);
+    try {
+      await s3Service.uploadFile(s3Key, file.data, file.mimetype);
+    } catch (error) {
+      throw new OiaFileUploadError('Error al subir archivos a S3', { cause: error });
+    }
 
     // Save record in DB
-    return OiaFile.create({
-      oiaId,
-      name: s3Key,
-      type: file.mimetype,
-      fileTypeCode: typeCode,
-      path: s3Key,
-    });
+    try {
+      return await OiaFile.create(
+        {
+          oiaId,
+          name: s3Key,
+          type: file.mimetype,
+          fileTypeCode: typeCode,
+          path: s3Key,
+        },
+        { transaction }
+      );
+    } catch (error) {
+      throw new OiaFileSaveError('Error al guardar archivos del OIA', { cause: error });
+    }
   }
 }
 
 export const oiaService = new OiaService();
+
+export class OiaFileUploadError extends Error {
+  constructor(message: string, options?: { cause?: unknown }) {
+    super(message, options);
+    this.name = 'OiaFileUploadError';
+  }
+}
+
+export class OiaFileSaveError extends Error {
+  constructor(message: string, options?: { cause?: unknown }) {
+    super(message, options);
+    this.name = 'OiaFileSaveError';
+  }
+}

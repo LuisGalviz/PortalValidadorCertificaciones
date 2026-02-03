@@ -1,6 +1,7 @@
 import { Profile } from '@portal/shared';
-import type { Response } from 'express';
+import type { NextFunction, Response } from 'express';
 import type { AuthenticatedRequest } from '../middleware/auth.js';
+import { handleControllerError } from '../middleware/handleControllerError.js';
 import { inspectorService } from '../services/InspectorService.js';
 import {
   createInspectorSchema,
@@ -10,7 +11,7 @@ import {
 } from '../validators/index.js';
 
 export class InspectorController {
-  async findAll(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async findAll(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const filters = inspectorFilterSchema.parse(req.query);
 
@@ -26,15 +27,13 @@ export class InspectorController {
         ...result,
       });
     } catch (error) {
-      if (error instanceof Error && error.name === 'ZodError') {
-        res.status(400).json({ success: false, error: 'Invalid query parameters' });
-        return;
-      }
-      res.status(500).json({ success: false, error: 'Error fetching inspectors' });
+      handleControllerError(error, next, 'Error fetching inspectors', {
+        zodMessage: 'Invalid query parameters',
+      });
     }
   }
 
-  async findById(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async findById(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = idParamSchema.parse(req.params);
       const inspector = await inspectorService.findById(id);
@@ -55,15 +54,13 @@ export class InspectorController {
         data: inspector,
       });
     } catch (error) {
-      if (error instanceof Error && error.name === 'ZodError') {
-        res.status(400).json({ success: false, error: 'Invalid inspector ID' });
-        return;
-      }
-      res.status(500).json({ success: false, error: 'Error fetching inspector' });
+      handleControllerError(error, next, 'Error fetching inspector', {
+        zodMessage: 'Invalid inspector ID',
+      });
     }
   }
 
-  async create(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async create(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const data = createInspectorSchema.parse(req.body);
 
@@ -93,15 +90,13 @@ export class InspectorController {
         data: inspector,
       });
     } catch (error) {
-      if (error instanceof Error && error.name === 'ZodError') {
-        res.status(400).json({ success: false, error: 'Invalid inspector data' });
-        return;
-      }
-      res.status(500).json({ success: false, error: 'Error creating inspector' });
+      handleControllerError(error, next, 'Error creating inspector', {
+        zodMessage: 'Invalid inspector data',
+      });
     }
   }
 
-  async update(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async update(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = idParamSchema.parse(req.params);
       const data = updateInspectorSchema.parse(req.body);
@@ -126,11 +121,9 @@ export class InspectorController {
         data: inspector,
       });
     } catch (error) {
-      if (error instanceof Error && error.name === 'ZodError') {
-        res.status(400).json({ success: false, error: 'Invalid inspector data' });
-        return;
-      }
-      res.status(500).json({ success: false, error: 'Error updating inspector' });
+      handleControllerError(error, next, 'Error updating inspector', {
+        zodMessage: 'Invalid inspector data',
+      });
     }
   }
 }

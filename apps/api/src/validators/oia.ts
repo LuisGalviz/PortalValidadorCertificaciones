@@ -7,27 +7,34 @@ export const oiaFilterSchema = paginationSchema.extend({
 });
 
 export const createOiaSchema = z.object({
-  identification: z.number().int(),
+  identification: z.coerce.number().int(),
   name: z.string().min(1),
   codeAcred: z.string().min(1),
   effectiveDate: z.string().or(z.date()).optional(),
-  cedRepLegal: z.number().int().optional(),
+  cedRepLegal: z.coerce.number().int().optional(),
   nameRepLegal: z.string().optional(),
   addressRepLegal: z.string().optional(),
-  typeOrganismId: z.number().int().optional(),
+  typeOrganismId: z.coerce.number().int().optional(),
   addressOrganism: z.string().optional(),
   nameContact: z.string().optional(),
-  phoneContact: z.number().int().optional(),
-  phoneContactAlternative: z.number().int().optional(),
+  phoneContact: z.coerce.number().int().optional(),
+  phoneContactAlternative: z.coerce.number().int().optional(),
   emailContact: z.string().email().optional(),
-  codeOrganism: z.number().int().optional(),
-  organismCodes: z.record(z.unknown()).optional(),
+  codeOrganism: z.coerce.number().int().optional(),
+  organismCodes: z.union([z.record(z.unknown()), z.array(z.record(z.unknown()))]).optional(),
 });
 
 export const updateOiaSchema = createOiaSchema.partial().extend({
   status: z.number().int().optional(),
   comment: z.string().optional(),
   active: z.boolean().optional(),
+});
+
+export const registerOiaSchema = createOiaSchema.extend({
+  userName: z.string().min(1),
+  userPhone: z.coerce.number().int(),
+  userEmail: z.string().email(),
+  acceptedTermsAndConditions: z.coerce.boolean().optional(),
 });
 
 export const updateOwnOiaSchema = z.object({
@@ -54,3 +61,4 @@ export type OiaFilterInput = z.infer<typeof oiaFilterSchema>;
 export type CreateOiaInput = z.infer<typeof createOiaSchema>;
 export type UpdateOiaInput = z.infer<typeof updateOiaSchema>;
 export type UpdateOwnOiaInput = z.infer<typeof updateOwnOiaSchema>;
+export type RegisterOiaInput = z.infer<typeof registerOiaSchema>;

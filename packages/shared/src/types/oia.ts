@@ -17,7 +17,7 @@ export interface Oia {
   emailContact?: string | null;
   userId?: number | null;
   codeOrganism?: number | null;
-  organismCodes?: Record<string, unknown> | null;
+  organismCodes?: Record<string, unknown> | Record<string, unknown>[] | null;
   acceptedTermsAndConditions?: boolean | null;
   status: OiaStatusCodeType;
   comment?: string | null;
@@ -59,7 +59,7 @@ export interface CreateOiaInput {
   phoneContactAlternative?: number;
   emailContact?: string;
   codeOrganism?: number;
-  organismCodes?: Record<string, unknown>;
+  organismCodes?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 export interface UpdateOiaInput {
@@ -77,7 +77,7 @@ export interface UpdateOiaInput {
   phoneContactAlternative?: number;
   emailContact?: string;
   codeOrganism?: number;
-  organismCodes?: Record<string, unknown>;
+  organismCodes?: Record<string, unknown> | Record<string, unknown>[];
   status?: OiaStatusCodeType;
   comment?: string;
   active?: boolean;
@@ -89,6 +89,10 @@ export interface OiaListItem {
   name: string;
   codeAcred: string;
   effectiveDate?: Date | null;
+  typeOrganismName?: string | null;
+  nameContact?: string | null;
+  createdAt?: Date;
+  acceptedTermsAndConditions?: boolean | null;
   status: OiaStatusCodeType;
   statusName: string;
   active?: boolean | null;
