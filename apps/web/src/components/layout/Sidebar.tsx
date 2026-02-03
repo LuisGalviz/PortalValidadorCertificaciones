@@ -1,7 +1,7 @@
 import { useAuth } from '@/features/auth';
 import { useSidebar } from '@/hooks';
 import { cn } from '@/lib/utils';
-import { Permissions, hasPermission } from '@portal/shared';
+import { Permissions, Profile, hasPermission } from '@portal/shared';
 import {
   Briefcase,
   Building2,
@@ -48,6 +48,10 @@ export function Sidebar() {
   const isCollapsed = state === 'collapsed';
 
   const filteredNavigation = navigation.filter((item) => {
+    if (item.permission === Permissions.OIAS_READ_OWN && user?.permission !== Profile.Oia) {
+      return false;
+    }
+
     return hasPermission(user?.permission ?? null, item.permission);
   });
 
