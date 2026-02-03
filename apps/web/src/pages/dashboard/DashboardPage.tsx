@@ -1,4 +1,4 @@
-import { PageContainer } from '@/components/layout';
+import { PageContainer, usePageHeader } from '@/components/layout';
 import { PendingReportsTable } from '@/components/tables/PendingReportsTable';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { api } from '@/lib/api';
@@ -13,6 +13,11 @@ interface DashboardStats {
 }
 
 export function DashboardPage() {
+  usePageHeader({
+    title: 'Dashboard',
+    subtitle: 'Resumen de reportes de certificación',
+  });
+
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: () => api.get<DashboardStats>('/dashboard/stats'),
@@ -54,15 +59,6 @@ export function DashboardPage() {
       className="flex flex-col space-y-4 lg:space-y-6 xl:space-y-8 min-w-0 h-full"
       fullHeight={true}
     >
-      <div className="min-w-0 flex-shrink-0">
-        <h1 className="text-xl lg:text-2xl xl:text-3xl font-bold text-slate-900 truncate">
-          Dashboard
-        </h1>
-        <p className="text-sm lg:text-base xl:text-lg text-slate-600 truncate">
-          Resumen de reportes de certificación
-        </p>
-      </div>
-
       <div className="grid gap-3 lg:gap-4 xl:gap-6 md:grid-cols-2 lg:grid-cols-4 min-w-0 flex-shrink-0">
         {statCards.map((stat) => (
           <Card key={stat.title} className="min-w-0 px-1 py-1">

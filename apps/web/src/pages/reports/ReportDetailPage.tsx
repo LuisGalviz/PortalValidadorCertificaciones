@@ -1,4 +1,4 @@
-import { PageContainer } from '@/components/layout';
+import { PageContainer, usePageHeader } from '@/components/layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,7 +16,7 @@ import { dismissLoading, showError, showLoading, showSuccess } from '@/lib/toast
 import { ReportStatusText, StatusCode } from '@portal/shared';
 import type { Causal, CheckListItem, ReportDetail } from '@portal/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Check, X } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -427,58 +427,26 @@ function CommentCard({
   );
 }
 
-export function ReportDetailPage() {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+type ReportReview = ReturnType<typeof useReportReview>;
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['report', id],
-    queryFn: () => api.get<ReportDetailResponse>(`/reports/${id}`),
-    enabled: !!id,
-  });
+interface ReportDetailContentProps {
+  report: ReportDetail;
+  causals: Causal[];
+  pdfUrl: string | null;
+  review: ReportReview;
+  onBack: () => void;
+}
 
-  const { data: causalsData } = useQuery({
-    queryKey: ['causals'],
-    queryFn: () => api.get<CausalsResponse>('/catalogs/causals'),
-  });
-
-  const report = data?.data;
-  const causals = causalsData?.data || [];
-  const pdfUrl = useMemo(() => getPdfUrl(report?.files), [report?.files]);
-
-  const review = useReportReview(id, report);
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" />
-      </div>
-    );
-  }
-
-  if (error || !report) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-red-500">Error al cargar el reporte</p>
-        <Button variant="outline" onClick={() => navigate('/reports')} className="mt-4">
-          Volver a la lista
-        </Button>
-      </div>
-    );
-  }
-
+function ReportDetailContent({
+  report,
+  causals,
+  pdfUrl,
+  review,
+  onBack,
+}: ReportDetailContentProps) {
   return (
     <PageContainer className="h-full flex flex-col min-w-0" scrollable={true}>
-      <div className="flex items-center gap-3 xl:gap-4 pb-2 xl:pb-3 flex-shrink-0">
-        <Button variant="ghost" size="sm" onClick={() => navigate('/reports')}>
-          <ArrowLeft className="h-4 w-4 xl:h-5 xl:w-5 mr-2" />
-          Volver
-        </Button>
-        <div className="flex-1 min-w-0">
-          <h1 className="text-lg lg:text-xl xl:text-2xl font-bold text-slate-900 truncate">
-            Reporte #{report.id}
-          </h1>
-        </div>
+      <div className="flex items-center justify-end pb-2 xl:pb-3 flex-shrink-0">
         {getStatusBadge(report.status)}
       </div>
 
@@ -524,8 +492,7 @@ export function ReportDetailPage() {
           </div>
 
           <div className="flex-shrink-0 pt-3 xl:pt-4 border-t mt-2 flex gap-2 xl:gap-3 justify-end flex-wrap">
-            <Button variant="outline" onClick={() => navigate('/reports')} className="xl:h-10">
-              <ArrowLeft className="h-4 w-4 xl:h-5 xl:w-5 mr-2" />
+            <Button variant="outline" onClick={onBack} className="xl:h-10">
               {review.canReview ? 'Cancelar Gestión' : 'Regresar al Listado'}
             </Button>
             {review.canReject && (
@@ -553,5 +520,59 @@ export function ReportDetailPage() {
         </div>
       </div>
     </PageContainer>
+  );
+}
+
+export function ReportDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['report', id],
+    queryFn: () => api.get<ReportDetailResponse>(`/reports/${id}`),
+    enabled: !!id,
+  });
+
+  const { data: causalsData } = useQuery({
+    queryKey: ['causals'],
+    queryFn: () => api.get<CausalsResponse>('/catalogs/causals'),
+  });
+
+  const report = data?.data;
+  const causals = causalsData?.data || [];
+  const pdfUrl = useMemo(() => getPdfUrl(report?.files), [report?.files]);
+
+  const review = useReportReview(id, report);
+  const headerTitle = report?.id ? `Reporte #${report.id}` : id ? `Reporte #${id}` : 'Reporte';
+
+  usePageHeader({
+    title: headerTitle,
+    backTo: '/reports',
+  });
+
+  if (isLoading) {
+    return (
+      <PageContainer className="flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" />
+      </PageContainer>
+    );
+  }
+
+  if (error || !report) {
+    return (
+      <PageContainer className="flex flex-col items-center justify-center gap-4">
+        <p className="text-red-500">Error al cargar el reporte</p>
+      </PageContainer>
+    );
+  }
+
+  return (
+    <ReportDetailContent
+      report={report}
+      causals={causals}
+      pdfUrl={pdfUrl}
+      review={review}
+      onBack={() => navigate('/reports')}
+    />
   );
 }

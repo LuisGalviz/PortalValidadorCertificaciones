@@ -1,4 +1,4 @@
-import { PageContainer } from '@/components/layout';
+import { PageContainer, usePageHeader } from '@/components/layout';
 import { OiaUsersTable } from '@/components/tables';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,9 +17,9 @@ import { showError, showSuccess } from '@/lib/toast';
 import type { ApiResponse, Oia } from '@portal/shared';
 import { Permissions, hasPermission } from '@portal/shared';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 type ModalMode = 'create' | 'edit' | 'view';
 
@@ -173,6 +173,18 @@ export function OiaUsersListPage() {
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
   const canEdit = hasPermission(user?.permission ?? null, Permissions.OIAS_UPDATE);
+  const subtitle = (() => {
+    if (!id || Number.isNaN(oiaId)) return 'OIA inválida';
+    if (loading) return 'Cargando OIA...';
+    if (oiaName) return oiaName;
+    return `OIA #${id}`;
+  })();
+
+  usePageHeader({
+    title: 'Usuarios OIA',
+    subtitle,
+    backTo: '/oias',
+  });
 
   useEffect(() => {
     if (!id || Number.isNaN(oiaId)) {
@@ -268,33 +280,16 @@ export function OiaUsersListPage() {
 
   return (
     <PageContainer className="space-y-4 lg:space-y-6 xl:space-y-8 min-w-0">
-      <div className="flex items-center justify-between gap-4">
-        <div className="min-w-0">
-          <h1 className="text-xl lg:text-2xl xl:text-3xl font-bold text-slate-900 truncate">
-            Usuarios OIA
-          </h1>
-          <p className="text-sm lg:text-base xl:text-lg text-slate-600 truncate">
-            {loading ? 'Cargando OIA...' : oiaName ? `${oiaName}` : `OIA #${id}`}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          {canEdit && (
-            <Button onClick={openCreateModal} className="xl:h-11 xl:px-6 xl:text-base">
-              Crear usuario
-            </Button>
-          )}
-          <Button asChild variant="outline" className="xl:h-11 xl:px-6 xl:text-base flex-shrink-0">
-            <Link to="/oias">
-              <ArrowLeft className="h-4 w-4 xl:h-5 xl:w-5 mr-2" />
-              Volver
-            </Link>
-          </Button>
-        </div>
-      </div>
-
       <Card className="min-w-0">
         <CardHeader>
-          <CardTitle className="text-base lg:text-lg xl:text-xl">Listado de usuarios</CardTitle>
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <CardTitle className="text-base lg:text-lg xl:text-xl">Listado de usuarios</CardTitle>
+            {canEdit && (
+              <Button onClick={openCreateModal} className="w-full sm:w-auto xl:h-10 xl:px-4">
+                Crear usuario
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="px-0 sm:px-6">
           <OiaUsersTable

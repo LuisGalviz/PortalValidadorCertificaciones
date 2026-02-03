@@ -2,6 +2,7 @@ import { useSidebar } from '@/hooks';
 import { cn } from '@/lib/utils';
 import { Outlet } from 'react-router-dom';
 import { Header } from './Header';
+import { PageHeaderProvider } from './PageHeaderContext';
 import { Sidebar } from './Sidebar';
 
 export function MainLayout() {
@@ -49,10 +50,12 @@ export function MainLayout() {
       </div>
 
       <div className="flex flex-1 flex-col min-w-0 h-full overflow-hidden">
-        <Header />
-        <main className="flex-1 overflow-auto min-h-0 flex flex-col">
-          <Outlet />
-        </main>
+        <PageHeaderProvider>
+          <Header />
+          <main className="flex-1 overflow-auto min-h-0 flex flex-col">
+            <Outlet />
+          </main>
+        </PageHeaderProvider>
       </div>
     </div>
   );

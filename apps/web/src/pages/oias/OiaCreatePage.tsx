@@ -1,4 +1,4 @@
-import { PageContainer } from '@/components/layout';
+import { PageContainer, usePageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -16,9 +16,8 @@ import { showError, showSuccess } from '@/lib/toast';
 import type { ApiResponse } from '@portal/shared';
 import { Profile } from '@portal/shared';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 interface TypeOrganism {
   id: number;
@@ -159,6 +158,12 @@ export function OiaCreatePage() {
   const [gasera, setGasera] = useState('');
   const [codigo, setCodigo] = useState('');
 
+  usePageHeader({
+    title: 'Registro de OIA',
+    subtitle: 'Registre un nuevo organismo de inspección',
+    backTo: '/oias',
+  });
+
   const isAdmin = user?.permission === Profile.Admin;
 
   useEffect(() => {
@@ -268,24 +273,7 @@ export function OiaCreatePage() {
 
   return (
     <PageContainer className="space-y-4 lg:space-y-6 pb-6">
-      <div className="flex items-center justify-between gap-4 pb-8">
-        <div className="min-w-0">
-          <h1 className="text-xl lg:text-2xl xl:text-3xl font-bold text-slate-900 truncate">
-            Registro de OIA
-          </h1>
-          <p className="text-sm lg:text-base text-slate-600 truncate">
-            Registre un nuevo organismo de inspección
-          </p>
-        </div>
-        <Button asChild variant="outline" className="xl:h-11 xl:px-6 xl:text-base flex-shrink-0">
-          <Link to="/oias">
-            <ArrowLeft className="h-4 w-4 xl:h-5 xl:w-5 mr-2" />
-            Volver
-          </Link>
-        </Button>
-      </div>
-
-      <form onSubmit={handleSubmit} className="pt-2">
+      <form onSubmit={handleSubmit}>
         <div className="grid gap-6">
           <Card>
             <CardHeader>

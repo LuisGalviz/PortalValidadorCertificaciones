@@ -1,4 +1,4 @@
-import { PageContainer } from '@/components/layout';
+import { PageContainer, usePageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -15,9 +15,8 @@ import { showError, showSuccess } from '@/lib/toast';
 import type { ApiResponse, Oia } from '@portal/shared';
 import { OiaStatusCode, StatusRequestText } from '@portal/shared';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 interface TypeOrganism {
   id: number;
@@ -206,6 +205,12 @@ export function OiaEditPage() {
   const [codigo, setCodigo] = useState('');
   const [oia, setOia] = useState<OiaWithExtras | null>(null);
 
+  usePageHeader({
+    title: 'Editar OIA',
+    subtitle: oia?.name || (id ? `OIA #${id}` : ''),
+    backTo: '/oias',
+  });
+
   const statusOptions = useMemo(
     () => [
       { value: String(OiaStatusCode.Pending), label: StatusRequestText.Pending },
@@ -364,24 +369,7 @@ export function OiaEditPage() {
 
   return (
     <PageContainer className="space-y-4 lg:space-y-6 xl:space-y-8 min-w-0">
-      <div className="flex items-center justify-between gap-4 pb-8">
-        <div className="min-w-0">
-          <h1 className="text-xl lg:text-2xl xl:text-3xl font-bold text-slate-900 truncate">
-            Editar OIA
-          </h1>
-          <p className="text-sm lg:text-base xl:text-lg text-slate-600 truncate">
-            {oia?.name || `OIA #${id}`}
-          </p>
-        </div>
-        <Button asChild variant="outline" className="xl:h-11 xl:px-6 xl:text-base flex-shrink-0">
-          <Link to="/oias">
-            <ArrowLeft className="h-4 w-4 xl:h-5 xl:w-5 mr-2" />
-            Volver
-          </Link>
-        </Button>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-6 pt-2">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <Card>
           <CardHeader>
             <CardTitle>Información Básica</CardTitle>

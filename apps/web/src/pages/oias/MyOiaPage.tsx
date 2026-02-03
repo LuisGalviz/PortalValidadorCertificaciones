@@ -1,4 +1,4 @@
-import { PageContainer } from '@/components/layout';
+import { PageContainer, usePageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -152,6 +152,11 @@ function buildMultipartData(
 }
 
 export function MyOiaPage() {
+  usePageHeader({
+    title: 'Datos de mi Empresa',
+    subtitle: 'Actualice la información de su organismo de inspección',
+  });
+
   const [oia, setOia] = useState<OiaWithExtras | null>(null);
   const [typeOrganisms, setTypeOrganisms] = useState<TypeOrganism[]>([]);
   const [loading, setLoading] = useState(true);
@@ -261,15 +266,6 @@ export function MyOiaPage() {
 
   return (
     <PageContainer className="space-y-4 lg:space-y-6">
-      <div>
-        <h1 className="text-xl lg:text-2xl xl:text-3xl font-bold text-slate-900">
-          Datos de mi Empresa
-        </h1>
-        <p className="text-sm lg:text-base text-slate-600">
-          Actualice la información de su organismo de inspección
-        </p>
-      </div>
-
       <form onSubmit={handleSubmit}>
         <div className="grid gap-6">
           {/* Información Básica */}

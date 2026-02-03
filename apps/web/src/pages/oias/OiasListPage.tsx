@@ -1,4 +1,4 @@
-import { PageContainer } from '@/components/layout';
+import { PageContainer, usePageHeader } from '@/components/layout';
 import { OiasTable } from '@/components/tables/OiasTable';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,6 +30,11 @@ export function OiasListPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
+  usePageHeader({
+    title: 'OIAs',
+    subtitle: 'Organismos de Inspección Acreditados',
+  });
+
   const canCreate = hasPermission(user?.permission ?? null, Permissions.OIAS_CREATE);
   const canEdit = hasPermission(user?.permission ?? null, Permissions.OIAS_UPDATE);
   const canInspectors = hasPermission(user?.permission ?? null, Permissions.INSPECTORS_READ);
@@ -37,30 +42,11 @@ export function OiasListPage() {
 
   return (
     <PageContainer className="space-y-4 lg:space-y-6 xl:space-y-8 min-w-0">
-      <div className="flex items-center justify-between gap-4">
-        <div className="min-w-0">
-          <h1 className="text-xl lg:text-2xl xl:text-3xl font-bold text-slate-900 truncate">
-            OIAs
-          </h1>
-          <p className="text-sm lg:text-base xl:text-lg text-slate-600 truncate">
-            Organismos de Inspección Acreditados
-          </p>
-        </div>
-        {canCreate && (
-          <Button asChild className="xl:h-11 xl:px-6 xl:text-base flex-shrink-0">
-            <Link to="/oias/new">
-              <Plus className="h-4 w-4 xl:h-5 xl:w-5 mr-2" />
-              Nuevo OIA
-            </Link>
-          </Button>
-        )}
-      </div>
-
       <Card className="min-w-0">
         <CardHeader>
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <CardTitle className="text-base lg:text-lg xl:text-xl">Lista de OIAs</CardTitle>
-            <div className="flex items-center gap-3 xl:gap-4 flex-wrap">
+            <div className="flex items-center gap-3 xl:gap-4 flex-wrap w-full sm:w-auto">
               <Input
                 placeholder="Buscar..."
                 value={search}
@@ -79,6 +65,14 @@ export function OiasListPage() {
                   ))}
                 </SelectContent>
               </Select>
+              {canCreate && (
+                <Button asChild className="w-full sm:w-auto xl:h-10 xl:px-4">
+                  <Link to="/oias/new">
+                    <Plus className="h-4 w-4 xl:h-5 xl:w-5 mr-2" />
+                    Nuevo OIA
+                  </Link>
+                </Button>
+              )}
             </div>
           </div>
         </CardHeader>
