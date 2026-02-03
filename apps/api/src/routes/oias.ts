@@ -44,8 +44,16 @@ router.post(
   ]),
   (req, res, next) => oiaController.create(req, res, next)
 );
-router.put('/:id', ensureAuthenticated, canUpdateOias, (req, res, next) =>
-  oiaController.update(req, res, next)
+router.put(
+  '/:id',
+  ensureAuthenticated,
+  canUpdateOias,
+  upload.fields([
+    { name: 'fileOnac', maxCount: 1 },
+    { name: 'fileCRT', maxCount: 1 },
+    { name: 'fileExistenceCertificate', maxCount: 1 },
+  ]),
+  (req, res, next) => oiaController.update(req, res, next)
 );
 router.get('/:id/users', ensureAuthenticated, canReadOias, (req, res, next) =>
   oiaController.getUsers(req, res, next)

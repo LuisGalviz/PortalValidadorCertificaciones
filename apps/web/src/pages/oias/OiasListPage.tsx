@@ -31,6 +31,9 @@ export function OiasListPage() {
   const [statusFilter, setStatusFilter] = useState('all');
 
   const canCreate = hasPermission(user?.permission ?? null, Permissions.OIAS_CREATE);
+  const canEdit = hasPermission(user?.permission ?? null, Permissions.OIAS_UPDATE);
+  const canInspectors = hasPermission(user?.permission ?? null, Permissions.INSPECTORS_READ);
+  const canUsers = hasPermission(user?.permission ?? null, Permissions.OIAS_READ);
 
   return (
     <PageContainer className="space-y-4 lg:space-y-6 xl:space-y-8 min-w-0">
@@ -83,6 +86,9 @@ export function OiasListPage() {
           <OiasTable
             search={search}
             status={statusFilter === 'all' ? undefined : Number(statusFilter)}
+            canEdit={canEdit}
+            canInspectors={canInspectors}
+            canUsers={canUsers}
           />
         </CardContent>
       </Card>

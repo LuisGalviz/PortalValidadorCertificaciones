@@ -15,8 +15,10 @@ import { api } from '@/lib/api';
 import { showError, showSuccess } from '@/lib/toast';
 import type { ApiResponse } from '@portal/shared';
 import { Profile } from '@portal/shared';
+import { useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface TypeOrganism {
   id: number;
@@ -146,6 +148,7 @@ function getValidationError(
 export function OiaCreatePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [typeOrganisms, setTypeOrganisms] = useState<TypeOrganism[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -242,6 +245,7 @@ export function OiaCreatePage() {
 
       if (response.success) {
         showSuccess(response.message || 'OIA registrado correctamente');
+        queryClient.invalidateQueries({ queryKey: ['oias'] });
         navigate('/oias');
         return;
       }
@@ -263,17 +267,25 @@ export function OiaCreatePage() {
   }
 
   return (
-    <PageContainer className="space-y-4 lg:space-y-6">
-      <div>
-        <h1 className="text-xl lg:text-2xl xl:text-3xl font-bold text-slate-900">
-          Registro de OIA
-        </h1>
-        <p className="text-sm lg:text-base text-slate-600">
-          Registre un nuevo organismo de inspección
-        </p>
+    <PageContainer className="space-y-4 lg:space-y-6 pb-6">
+      <div className="flex items-center justify-between gap-4 pb-8">
+        <div className="min-w-0">
+          <h1 className="text-xl lg:text-2xl xl:text-3xl font-bold text-slate-900 truncate">
+            Registro de OIA
+          </h1>
+          <p className="text-sm lg:text-base text-slate-600 truncate">
+            Registre un nuevo organismo de inspección
+          </p>
+        </div>
+        <Button asChild variant="outline" className="xl:h-11 xl:px-6 xl:text-base flex-shrink-0">
+          <Link to="/oias">
+            <ArrowLeft className="h-4 w-4 xl:h-5 xl:w-5 mr-2" />
+            Volver
+          </Link>
+        </Button>
       </div>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="pt-2">
         <div className="grid gap-6">
           <Card>
             <CardHeader>
@@ -600,7 +612,7 @@ export function OiaCreatePage() {
             </div>
           </Card>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end pb-4">
             <Button type="submit" disabled={saving} className="w-full md:w-auto">
               {saving ? 'Registrando...' : 'Registrar OIA'}
             </Button>

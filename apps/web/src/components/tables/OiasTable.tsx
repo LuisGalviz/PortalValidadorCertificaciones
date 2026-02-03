@@ -9,7 +9,7 @@ import { api } from '@/lib/api';
 import { OiaStatusCode, StatusRequestText } from '@portal/shared';
 import type { OiaListItem, PaginatedResponse } from '@portal/shared';
 import { useQuery } from '@tanstack/react-query';
-import { Eye } from 'lucide-react';
+import { Pencil, User, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface OiasResponse {
@@ -52,9 +52,12 @@ const StatusCellRenderer = (props: { value: number }) => {
 interface OiasTableProps {
   search?: string;
   status?: number;
+  canEdit?: boolean;
+  canInspectors?: boolean;
+  canUsers?: boolean;
 }
 
-export function OiasTable({ search, status }: OiasTableProps) {
+export function OiasTable({ search, status, canEdit, canInspectors, canUsers }: OiasTableProps) {
   const gridRef = useRef<AgGridReact>(null);
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
@@ -118,16 +121,45 @@ export function OiasTable({ search, status }: OiasTableProps) {
       {
         field: 'actions',
         headerName: 'Acciones',
-        width: 100,
+        width: 160,
         sortable: false,
         cellRenderer: (params: { data: OiaListItem }) => (
-          <Button variant="outline" size="sm" onClick={() => navigate(`/oias/${params.data.id}`)}>
-            <Eye className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-2">
+            {canEdit && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(`/oias/${params.data.id}`)}
+                title="Editar OIA"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            )}
+            {canInspectors && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(`/inspectors?oiaId=${params.data.id}`)}
+                title="Ver inspectores"
+              >
+                <Users className="h-4 w-4" />
+              </Button>
+            )}
+            {canUsers && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(`/oias/${params.data.id}/users`)}
+                title="Ver usuarios"
+              >
+                <User className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         ),
       },
     ],
-    [navigate]
+    [navigate, canEdit, canInspectors, canUsers]
   );
 
   const defaultColDef = useMemo<ColDef>(

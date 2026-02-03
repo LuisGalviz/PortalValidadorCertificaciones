@@ -13,7 +13,7 @@ import { useAuth } from '@/features/auth';
 import { InspectorStatusCode, Permissions, hasPermission } from '@portal/shared';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 const statusOptions = [
   { value: 'all', label: 'Todos' },
   { value: String(InspectorStatusCode.Pending), label: 'Pendientes' },
@@ -27,6 +27,9 @@ import { PageContainer } from '@/components/layout';
 
 export function InspectorsListPage() {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const oiaIdParam = searchParams.get('oiaId');
+  const oiaId = oiaIdParam ? Number(oiaIdParam) : undefined;
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
@@ -83,6 +86,7 @@ export function InspectorsListPage() {
           <InspectorsTable
             search={search}
             status={statusFilter === 'all' ? undefined : Number(statusFilter)}
+            oiaId={Number.isNaN(oiaId) ? undefined : oiaId}
           />
         </CardContent>
       </Card>

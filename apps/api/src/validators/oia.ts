@@ -25,9 +25,9 @@ export const createOiaSchema = z.object({
 });
 
 export const updateOiaSchema = createOiaSchema.partial().extend({
-  status: z.number().int().optional(),
+  status: z.coerce.number().int().optional(),
   comment: z.string().optional(),
-  active: z.boolean().optional(),
+  active: z.coerce.boolean().optional(),
 });
 
 export const registerOiaSchema = createOiaSchema.extend({

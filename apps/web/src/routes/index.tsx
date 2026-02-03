@@ -6,6 +6,8 @@ import { DashboardPage } from '@/pages/dashboard/DashboardPage';
 import { InspectorsListPage } from '@/pages/inspectors/InspectorsListPage';
 import { MyOiaPage } from '@/pages/oias/MyOiaPage';
 import { OiaCreatePage } from '@/pages/oias/OiaCreatePage';
+import { OiaEditPage } from '@/pages/oias/OiaEditPage';
+import { OiaUsersListPage } from '@/pages/oias/OiaUsersListPage';
 import { OiasListPage } from '@/pages/oias/OiasListPage';
 import { ReportDetailPage } from '@/pages/reports/ReportDetailPage';
 import { ReportsListPage } from '@/pages/reports/ReportsListPage';
@@ -55,6 +57,22 @@ export const router = createBrowserRouter(
           element: (
             <ProtectedRoute requiredPermission={Permissions.OIAS_READ}>
               <OiasListPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'oias/:id/users',
+          element: (
+            <ProtectedRoute requiredPermission={Permissions.OIAS_READ}>
+              <OiaUsersListPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'oias/:id',
+          element: (
+            <ProtectedRoute requiredPermission={Permissions.OIAS_UPDATE}>
+              <OiaEditPage />
             </ProtectedRoute>
           ),
         },

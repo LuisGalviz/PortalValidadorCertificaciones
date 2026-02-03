@@ -142,7 +142,8 @@ export class OiaController {
   async findById(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = idParamSchema.parse(req.params);
-      const oia = await oiaService.findById(id);
+      const includeFiles = req.query.includeFiles === 'true' || req.query.includeFiles === '1';
+      const oia = await oiaService.findById(id, includeFiles);
 
       if (!oia) {
         res.status(404).json({ success: false, error: 'OIA not found' });
@@ -321,7 +322,15 @@ export class OiaController {
   async update(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = idParamSchema.parse(req.params);
-      const data = updateOiaSchema.parse(req.body);
+      const parsedOrganismCodes = getOrganismCodes(req.body?.organismCodes, res);
+      if (parsedOrganismCodes === null) {
+        return;
+      }
+
+      const data = updateOiaSchema.parse({
+        ...req.body,
+        organismCodes: parsedOrganismCodes,
+      });
 
       const oia = await oiaService.update(id, data);
 
@@ -330,11 +339,48 @@ export class OiaController {
         return;
       }
 
+      const files = (
+        req as AuthenticatedRequest & {
+          files?: Record<string, { buffer: Buffer; originalname: string; mimetype: string }[]>;
+        }
+      ).files;
+
+      if (files) {
+        if (files.fileOnac?.[0]) {
+          await oiaService.saveFile(
+            oia.id,
+            {
+              data: files.fileOnac[0].buffer,
+              name: files.fileOnac[0].originalname,
+              mimetype: files.fileOnac[0].mimetype,
+            },
+            'ONAC'
+          );
+        }
+
+        const fileCRT = files.fileCRT?.[0] || files.fileExistenceCertificate?.[0];
+        if (fileCRT) {
+          await oiaService.saveFile(
+            oia.id,
+            {
+              data: fileCRT.buffer,
+              name: fileCRT.originalname,
+              mimetype: fileCRT.mimetype,
+            },
+            'CRT'
+          );
+        }
+      }
+
       res.json({
         success: true,
         data: oia,
       });
     } catch (error) {
+      if (error instanceof OiaFileUploadError || error instanceof OiaFileSaveError) {
+        handleControllerError(error, next, error.message, { statusCode: 500 });
+        return;
+      }
       handleControllerError(error, next, 'Error updating OIA', {
         zodMessage: 'Invalid OIA data',
       });
